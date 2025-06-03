@@ -1,82 +1,36 @@
 "use client";
 
+import { useState } from "react";
+import Right from "./_components/Rigth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useFormik } from "formik";
-import { ChevronLeft, Link } from "lucide-react";
-import Image from "next/image";
-import * as Yup from "yup";
+import { Left } from "./_components/Left";
+import { Password } from "./_components/password";
 
-const validationLogIn = Yup.object({
-  email: Yup.string()
-    .required()
-    .test(
-      "email",
-      "Invalid email. Use format like example@email.com",
-      (value) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(value);
-      }
-    ),
-});
+const SignUpPage = ({}) => {
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
-<div>=</div>;
+  const components = [Left, Password];
+  const Stepper = components[currentStep];
 
-const SignUpPage = () => {
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-    },
-    validationSchema: validationLogIn,
-    onSubmit: (values) => {},
-  });
-
-  const emailInputProps = {
-    name: "email",
-    value: formik.values.email,
-    onChange: formik.handleChange,
-  };
-
-  const isButtonDisabled = !formik.errors.email;
+  const prevStep = () => setCurrentStep((prev) => prev - 1);
+  const nextStep = () => setCurrentStep((prev) => prev + 1);
 
   return (
-    <div className="flex gap-10 items-center justify-center mx-5">
-      <div className="flex flex-col  w-[416px] h-[288px] gap-4 border border-green-400">
-        <div>
-          <Button variant="outline" className="bg-transparent">
-            <ChevronLeft />
-          </Button>
-        </div>
-        <div>
-          <p className="text-2xl">Create your account</p>
-          <p>Sign up to explore your favorite dishes.</p>
-        </div>
+    <div className="flex justify-center items-center">
+      <div>
+        {/* {currentStep === 0 && (
+          <Left
+            // setCurrentStep={setCurrentStep}
+            // currentStep={currentStep}
+            nextStep={nextStep}
+          />
+        )}
 
-        <Input
-          className="w-full rounded-2"
-          placeholder="Enter your email address"
-          {...emailInputProps}
-        />
-        {/* <div></div> */}
-        <div className="text-red-500">
-          {formik.touched && formik.errors.email}
-        </div>
-        <Button
-          variant="ghost"
-          className="w-full rounded-2 border border-color-gray-50 bg-color-gray-200"
-        >
-          Let's go
-        </Button>
-        <div className="flex content-center items-center justify-center gap-4">
-          <p>Already have an acount?</p>
-          <Button className="text-blue-600 " variant="ghost">
-            {" "}
-            Log in
-          </Button>
-        </div>
+        <Password /> */}
+        <Stepper nextStep={nextStep} />
       </div>
-      <div className="w-[856px] h-[904px] rounded-[8px] border border-green-400">
-        <Image width={856} height={904} src={"/image.png"} alt="Driver"></Image>
+      <div>
+        <Right />
       </div>
     </div>
   );
