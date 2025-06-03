@@ -4,61 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFormik } from "formik";
 import { ChevronLeft, Link } from "lucide-react";
-import Image from "next/image";
-import * as Yup from "yup";
-import { useState } from "react";
+import { InputPropsType } from "../page";
+import Right from "./Rigth";
 
-const validationLogIn = Yup.object({
-  email: Yup.string()
-    .required()
-    .test(
-      "email",
-      "Invalid email. Use format like example@email.com",
-      (value) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(value);
-      }
-    ),
-  password: Yup.string()
-    .required()
-    .test("password", "confirm pass", (value) => {}),
-});
 
-type PageProps = {
-  nextStep: () => void;
-};
+export const Left = ( {values,
+  onChange,
+  onBlur,
+  touched,
+  errors, nextStep}: InputPropsType) => {
 
-export const Left = ({ nextStep }: PageProps) => {
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-    validationSchema: validationLogIn,
-    onSubmit: (values) => {},
-  });
 
-  const emailInputProps = {
-    name: "email",
-    placeholder: "Enter your email address",
-    value: formik.values.email,
-    onChange: formik.handleChange,
-  };
-  const passwordProps = {
-    name: "password",
-    placeholder: "password address",
-    value: formik.values.email,
-    onclick: formik.handleChange,
-  };
+  // const emailInputProps = {
+  //   name: "email",
+  //   placeholder: "Enter your email address",
+  //   value: formik.values.email,
+  //   onChange: formik.handleChange,
+  // };
+  // const passwordProps = {
+  //   name: "password",
+  //   placeholder: "password address",
+  //   value: formik.values.email,
+  //   onclick: formik.handleChange,
+  // };
 
-  const isButtonDisabled = !formik.errors.email;
+  const isButtonDisabled = !errors.email && !values.email;
 
   return (
     <div className="flex gap-10 items-center justify-center mx-5">
-      <div className="flex flex-col  w-[416px] h-[288px] gap-4 border border-green-400">
+      <div className="flex flex-col w-[416px] h-[288px] gap-4 shadow-md">
         <div>
-          <Button variant="outline" className="bg-transparent">
+          <Button variant="outline" disabled={false} className="bg-transparent">
             <ChevronLeft />
           </Button>
         </div>
@@ -67,11 +43,11 @@ export const Left = ({ nextStep }: PageProps) => {
           <p>Sign up to explore your favorite dishes.</p>
         </div>
 
-        <Input className="w-full rounded-2" {...emailInputProps} />
-
-        <div className="text-red-500">
-          {formik.touched && formik.errors.email}
-        </div>
+        <Input name="email" placeholder="Enter your email address" value={values.email} onChange={onChange} onBlur={onBlur} className="w-full rounded-2" />
+        {touched.email && errors.email && (
+         <div className="text-red-500">{errors.email}</div>
+        )}
+       
 
         <div>
           {
@@ -79,21 +55,14 @@ export const Left = ({ nextStep }: PageProps) => {
               variant="ghost"
               className="w-full rounded-2 border border-color-gray-50 bg-color-gray-200"
               onClick={nextStep}
+              disabled={isButtonDisabled}
             >
               Lets go
             </Button>
           }
         </div>
 
-        {/* <Button
-          onClick={nextStep}
-          variant="ghost"
-          className="w-full rounded-2 border border-color-gray-50 bg-color-gray-200"
-        >
-          Let's go
-        </Button> */}
-
-        <div className="flex content-center items-center justify-center gap-4">
+        <div className="flex content-center items-center justify-center gap-2">
           <p>Already have an acount?</p>
           <Button className="text-blue-600 " variant="ghost">
             {" "}
@@ -101,8 +70,81 @@ export const Left = ({ nextStep }: PageProps) => {
           </Button>
         </div>
       </div>
+      <Right/>
     </div>
   );
 };
 
-// export default Left;
+
+// "use client";
+
+// import { Button } from "@/components/ui/button";
+// import { Input } from "@/components/ui/input";
+// import { ChevronLeft } from "lucide-react";
+// import { InputPropsType } from "../page";
+
+// export const Left = ({
+//   values,
+//   onChange,
+//   onBlur,
+//   touched,
+//   nextStep,
+//   errors,
+// }: InputPropsType) => {
+//   const isButtonDisabled = !!errors.email || !values.email;
+
+//   return (
+//     <div className="flex gap-10 items-center justify-center mx-5">
+//       <div className="flex flex-col w-[416px] h-[288px] gap-4">
+//         <div>
+//           <Button
+//             variant="outline"
+//             className="bg-transparent"
+//             onClick={() => window.history.back()} // Optional: Navigate back
+//             disabled={false} // Adjust based on your needs
+//           >
+//             <ChevronLeft />
+//           </Button>
+//         </div>
+//         <div>
+//           <p className="text-2xl">Create your account</p>
+//           <p>Sign up to explore your favorite dishes.</p>
+//         </div>
+
+//         <Input
+//           name="email"
+//           placeholder="Enter your email address"
+//           value={values.email}
+//           onChange={onChange}
+//           onBlur={onBlur}
+//           className="w-full rounded-md"
+//         />
+//         {touched.email && errors.email && (
+//           <div className="text-red-500 text-sm">{errors.email}</div>
+//         )}
+
+//         <div>
+//           <Button
+//             variant="ghost"
+//             className="w-full rounded-md border border-gray-300 bg-gray-200"
+//             onClick={nextStep}
+//             disabled={isButtonDisabled}
+//           >
+//             Let’s go
+//           </Button>
+//         </div>
+
+//         <div className="flex items-center justify-center gap-4">
+//           <p>Already have an account?</p>
+//           <Button
+//             variant="ghost"
+//             className="text-blue-600"
+//             onClick={() => window.location.href = "/login"} // Adjust to your login route
+//           >
+//             Log in
+//           </Button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
