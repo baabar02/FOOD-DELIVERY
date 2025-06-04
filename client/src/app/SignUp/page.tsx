@@ -1,16 +1,13 @@
-
-
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Button } from "@/components/ui/button";
 import { Left } from "./_components/Left";
-import { Password } from "./_components/Password"; 
+import { Password } from "./_components/Password";
 import Right from "./_components/Rigth";
-
 
 type FormValues = {
   email: string;
@@ -31,19 +28,17 @@ type Errors = {
 };
 
 export type InputPropsType = {
-  
   values: FormValues;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   touched: TouchedType;
   errors: Errors;
   handleSubmit: () => void;
- 
+  togglePassword: () => void;
+  showPassword: boolean;
   prevStep: () => void;
   nextStep: () => void;
-  
 };
-
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -68,30 +63,31 @@ const SignUpPage = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
 
-  const Components = [Left, Password]; 
+  const Components = [Left, Password];
   const Stepper = Components[currentStep];
 
   const prevStep = () => setCurrentStep((prev) => prev - 1);
   const nextStep = () => setCurrentStep((prev) => prev + 1);
 
- 
-  const formik = useFormik<FormValues>({
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  console.log(showPassword, "asd");
 
+  const togglePassword = () => setShowPassword((prev) => !prev);
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       email: "",
       password: "",
       confirmPassword: "",
     },
-    validationSchema:validationSchema,
+    validationSchema: validationSchema,
 
     onSubmit: (values) => {
-      
       if (currentStep < Components.length - 1) {
-        nextStep(); 
+        nextStep();
       } else {
-        router.push('/')
-        console.log(values,"asddadas");
-    
+        router.push("/");
+        console.log(values, "asddadas");
       }
     },
   });
@@ -100,7 +96,7 @@ const SignUpPage = () => {
     <div className="flex justify-center items-center min-h-screen">
       <form onSubmit={formik.handleSubmit}>
         <div className="flex gap-10">
-          <Stepper 
+          <Stepper
             prevStep={prevStep}
             nextStep={nextStep}
             values={formik.values}
@@ -109,8 +105,9 @@ const SignUpPage = () => {
             touched={formik.touched}
             errors={formik.errors}
             handleSubmit={formik.handleSubmit}
+            togglePassword={togglePassword}
+            showPassword={showPassword}
           />
-         
         </div>
       </form>
     </div>

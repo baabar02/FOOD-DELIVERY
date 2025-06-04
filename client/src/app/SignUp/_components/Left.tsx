@@ -7,14 +7,14 @@ import { ChevronLeft, Link } from "lucide-react";
 import { InputPropsType } from "../page";
 import Right from "./Rigth";
 
-
-export const Left = ( {values,
+export const Left = ({
+  values,
   onChange,
   onBlur,
   touched,
-  errors, nextStep}: InputPropsType) => {
-
-
+  errors,
+  nextStep,
+}: InputPropsType) => {
   // const emailInputProps = {
   //   name: "email",
   //   placeholder: "Enter your email address",
@@ -43,17 +43,23 @@ export const Left = ( {values,
           <p>Sign up to explore your favorite dishes.</p>
         </div>
 
-        <Input name="email" placeholder="Enter your email address" value={values.email} onChange={onChange} onBlur={onBlur} className="w-full rounded-2" />
+        <Input
+          name="email"
+          placeholder="Enter your email address"
+          value={values.email}
+          onChange={onChange}
+          onBlur={onBlur}
+          className="w-full rounded-2"
+        />
         {touched.email && errors.email && (
-         <div className="text-red-500">{errors.email}</div>
+          <div className="text-red-500">{errors.email}</div>
         )}
-       
 
         <div>
           {
             <Button
               variant="ghost"
-              className="w-full rounded-2 border border-color-gray-50 bg-color-gray-200"
+              className="w-full rounded-2 border border-color-gray-50 bg-color-gray-300"
               onClick={nextStep}
               disabled={isButtonDisabled}
             >
@@ -70,11 +76,10 @@ export const Left = ( {values,
           </Button>
         </div>
       </div>
-      <Right/>
+      <Right />
     </div>
   );
 };
-
 
 // "use client";
 

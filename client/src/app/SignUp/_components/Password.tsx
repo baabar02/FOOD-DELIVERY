@@ -75,7 +75,6 @@
 //   );
 // };
 
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -84,7 +83,7 @@ import { InputPropsType } from "../page";
 import Right from "./Rigth";
 import { Check } from "lucide-react";
 import { useState } from "react";
-import { CheckboxIcon } from "@radix-ui/react-icons";
+import { Checkbox } from "@radix-ui/react-checkbox";
 
 export const Password = ({
   values,
@@ -92,14 +91,11 @@ export const Password = ({
   onBlur,
   touched,
   errors,
-  handleSubmit, prevStep}: InputPropsType) => {
-
-  const [showPassword,setShowPassword] = useState(false);
-  console.log(showPassword,"asd");
-  
-  const togglePassword = () => setShowPassword((prev) => !prev)
-
-
+  handleSubmit,
+  togglePassword,
+  prevStep,
+  showPassword,
+}: InputPropsType) => {
   const isButtonDisabled =
     !!errors.password || !!errors.confirmPassword || !values.password;
 
@@ -119,56 +115,49 @@ export const Password = ({
           <p className="text-2xl">Create a strong password</p>
           <p>Create a strong password with letters, numbers.</p>
         </div>
-<div className="flex flex-col gap-4">
-<Input
-          name="password"
-          type={showPassword ? "text" : "password"}
-          placeholder="Enter your password"
-          value={values.password}
-          onChange={onChange}
-          onBlur={onBlur}
-          className="w-full rounded-md"
-        />
-        {touched.password && errors.password && (
-          <div className="text-red-500 text-sm">{errors.password}</div>
-        )}
+        <div className="flex flex-col gap-4">
+          <Input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Enter your password"
+            value={values.password}
+            onChange={onChange}
+            onBlur={onBlur}
+            className="w-full rounded-md"
+          />
+          {touched.password && errors.password && (
+            <div className="text-red-500 text-sm">{errors.password}</div>
+          )}
 
-        <Input
-          name="confirmPassword"
-          type={ showPassword? "text": "password"}
-          placeholder="Confirm your password"
-          value={values.confirmPassword}
-          onChange={onChange}
-          onBlur={onBlur}
-          className="w-full rounded-md"
-        />
-        {touched.confirmPassword && errors.confirmPassword && (
-          <div className="text-red-500 text-sm">{errors.confirmPassword}</div>
-        )}
-        <div className="flex items-center gap-3">
-          
-            <Check className="w-[20px] h-[20px]"
-            aria-checked={showPassword}
-            onChange={togglePassword} 
-            
-            /> 
+          <Input
+            name="confirmPassword"
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm your password"
+            value={values.confirmPassword}
+            onChange={onChange}
+            onBlur={onBlur}
+            className="w-full rounded-md"
+          />
+          {touched.confirmPassword && errors.confirmPassword && (
+            <div className="text-red-500 text-sm">{errors.confirmPassword}</div>
+          )}
+          <div className="flex items-center gap-3">
+            <Checkbox />
             <p>Show password</p>
-        </div>
-        <div>
-          <Button
-            variant="ghost"
-            className="w-full rounded-md border border-gray-300 bg-gray-200"
-            onClick={() => handleSubmit()}
-            disabled={isButtonDisabled}
-          >
-            Submit
-          </Button>
-</div>
-        
+          </div>
+          <div>
+            <Button
+              variant="ghost"
+              className="w-full rounded-md border border-gray-300 bg-gray-200"
+              onClick={() => handleSubmit()}
+              disabled={isButtonDisabled}
+            >
+              Submit
+            </Button>
+          </div>
         </div>
       </div>
-      <Right/>
+      <Right />
     </div>
   );
 };
-
