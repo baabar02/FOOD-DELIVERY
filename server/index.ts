@@ -56,6 +56,17 @@ app.put("/users", async (request: Request, response: Response) => {
   response.send(updateUser);
 });
 
+app.delete("/users", async (request: Request, response: Response) => {
+  const { id } = request.body;
+  const deleteUser = await UserModel.findByIdAndDelete(
+    { _id: id },
+
+    { new: true }
+  );
+
+  response.send(deleteUser);
+});
+
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
