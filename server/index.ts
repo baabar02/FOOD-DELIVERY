@@ -15,7 +15,7 @@ const databaseConnect = async () => {
 const Users = new Schema({
   email: { type: String, require: true },
   password: { type: String, require: true },
-
+  firstName: { type: String, request: true },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -34,9 +34,9 @@ app.get("/users", async (request: Request, response: Response) => {
 app.post("/users", async (request: Request, response: Response) => {
   console.log("hi");
 
-  const { email, password } = request.body;
+  const { email, password, firstName } = request.body;
 
-  const result = await UserModel.create({ email, password });
+  const result = await UserModel.create({ email, password, firstName });
   response.send(result);
 });
 
@@ -48,12 +48,27 @@ app.put("/users", async (request: Request, response: Response) => {
     {
       email: input.email,
       password: input.password,
+      firstName: input.firstName,
     },
     {
       new: true,
     }
   );
   response.send(updateUser);
+});
+
+app.patch("/users", async (request: Request, response: Response) => {
+  const { id, input } = request.body;
+  const patchUser = await UserModel.findOneAndReplace(
+    { _id: id },
+    {
+      email: input.email,
+      password: input.password,
+      firstName: input.firstName,
+    },
+    { new: true }
+  );
+  response.send(patchUser);
 });
 
 app.delete("/users", async (request: Request, response: Response) => {
