@@ -71,9 +71,10 @@ export const Password = ({
           </div>
           <div>
             <Button
+              type="submit"
               variant="ghost"
               className="w-full rounded-md border border-gray-300 bg-gray-200"
-              onClick={() => handleSubmit()}
+              onClick={handleSubmit}
               disabled={isButtonDisabled}
             >
               Submit

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Left } from "./_components/Left";
 import { Password } from "./_components/Password";
 import Right from "./_components/Rigth";
+import axios from "axios";
+import { writeFileSync } from "fs";
 
 type FormValues = {
   email: string;
@@ -82,13 +84,26 @@ const SignUpPage = () => {
     },
     validationSchema: validationSchema,
 
-    onSubmit: (values) => {
-      if (currentStep < Components.length - 1) {
-        nextStep();
-      } else {
-        router.push("/");
-        console.log(values, "asddadas");
+    onSubmit: async (values) => {
+      console.log("asdfghjkl");
+
+      const response = await axios.post("http://localhost:8000/signup", {
+        email: values.email,
+        password: values.password,
+      });
+
+      if (response.data.message === "User already existed") {
+        alert("asd");
       }
+
+      console.log(response, "axios");
+
+      // if (currentStep < Components.length - 1) {
+      //   nextStep();
+      // } else {
+      router.push("/");
+      //   console.log(values, "asddadas");
+      // }
     },
   });
 
