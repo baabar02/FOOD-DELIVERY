@@ -1,6 +1,8 @@
 import express, { request, Request, Response } from "express";
 import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
+import bcrypt from "bcrypt";
+import cors from "cors";
 
 const databaseConnect = async () => {
   try {
@@ -24,63 +26,101 @@ const UserModel = model("Users", Users);
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+
 databaseConnect();
 
-app.get("/users", async (request: Request, response: Response) => {
-  const users = await UserModel.find();
-  response.send("successfully");
+app.get("/", async (request: Request, response: Response) => {
+  response.send("Hello world");
 });
 
-app.post("/users", async (request: Request, response: Response) => {
-  console.log("hi");
-
-  const { email, password, firstName } = request.body;
-
-  const result = await UserModel.create({ email, password, firstName });
-  response.send(result);
+app.post("/signup", async (request: Request, response: Response) => {
+  const { email, password } = request.body;
+  const isEmailExisted = await UserModel.findOne({ email });
+  if (!isEmailExisted) {
+    const hashedPassword = await bcrypt.hashSync(password, 10);
+    await UserModel.create({ email, password: hashedPassword });
+    response.send({ messege: "Successfully registered" });
+    return;
+  }
+  response.send({ message: "User already existed" });
 });
 
-app.put("/users", async (request: Request, response: Response) => {
-  const { id, input } = request.body;
-
-  const updateUser = await UserModel.findByIdAndUpdate(
-    { _id: id },
-    {
-      email: input.email,
-      password: input.password,
-      firstName: input.firstName,
-    },
-    {
-      new: true,
+app.post("/login", async (request: Request, response: Response) => {
+  const { email, password } = request.body;
+  const isEmailExisted = await UserModel.findOne({ email });
+  if (!isEmailExisted) {
+    response.status(400).send({ message: "User doesn't exit " });
+    return;
+  } else {
+    const hashedPassword = await bcrypt.compareSync(
+      password,
+      isEmailExisted.password!
+    );
+    if (hashedPassword) {
+      response.send({ message: "Successfully logged in " });
+      return;
+    } else {
+      response.send({ message: " Wrong password, try again" });
+      return;
     }
-  );
-  response.send(updateUser);
+  }
 });
+// app.get("/users", async (request: Request, response: Response) => {
+//   const users = await UserModel.find();
+//   response.send("successfully");
+// });
 
-app.patch("/users", async (request: Request, response: Response) => {
-  const { id, input } = request.body;
-  const patchUser = await UserModel.findOneAndReplace(
-    { _id: id },
-    {
-      email: input.email,
-      password: input.password,
-      firstName: input.firstName,
-    },
-    { new: true }
-  );
-  response.send(patchUser);
-});
+// app.post("/users", async (request: Request, response: Response) => {
+//   console.log("hi");
 
-app.delete("/users", async (request: Request, response: Response) => {
-  const { id } = request.body;
-  const deleteUser = await UserModel.findByIdAndDelete(
-    { _id: id },
+//   const { email, password, firstName } = request.body;
 
-    { new: true }
-  );
+//   const result = await UserModel.create({ email, password, firstName });
+//   response.send(result);
+// });
 
-  response.send(deleteUser);
-});
+// app.put("/users", async (request: Request, response: Response) => {
+//   const { id, input } = request.body;
+
+//   const updateUser = await UserModel.findByIdAndUpdate(
+//     { _id: id },
+//     {
+//       email: input.email,
+//       password: input.password,
+//       firstName: input.firstName,
+//     },
+//     {
+//       new: true,
+//     }
+//   );
+//   response.send(updateUser);
+// });
+
+// app.patch("/users", async (request: Request, response: Response) => {
+//   const { id, input } = request.body;
+//   const patchUser = await UserModel.findOneAndReplace(
+//     { _id: id },
+//     {
+//       email: input.email,
+//       password: input.password,
+//       firstName: input.firstName,
+//     },
+//     { new: true }
+//   );
+//   response.send(patchUser);
+// });
+
+// app.delete("/users", async (request: Request, response: Response) => {
+//   const { id } = request.body;
+//   const deleteUser = await UserModel.findByIdAndDelete(
+//     { _id: id },
+
+//     { new: true }
+//   );
+
+//   response.send(deleteUser);
+// });
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
