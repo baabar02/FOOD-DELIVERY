@@ -35,7 +35,11 @@ app.get("/", async (request: Request, response: Response) => {
 });
 
 app.post("/signup", async (request: Request, response: Response) => {
-  const { email, password } = request.body;
+  const { email, password,firstName } = request.body;
+  if (!email || !password) {
+    response.status(400).send({ message: "Email and password are required" });
+    return;
+  }
   const isEmailExisted = await UserModel.findOne({ email });
   if (!isEmailExisted) {
     const hashedPassword = await bcrypt.hashSync(password, 10);
@@ -48,6 +52,10 @@ app.post("/signup", async (request: Request, response: Response) => {
 
 app.post("/login", async (request: Request, response: Response) => {
   const { email, password } = request.body;
+  if (!email || !password) {
+    response.status(400).send({ message: "Email and password are required" });
+    return;
+  }
   const user = await UserModel.findOne({ email });
   if (!user) {
     response.status(400).send({ message: "User doesn't exit " });
@@ -70,11 +78,39 @@ app.post("/login", async (request: Request, response: Response) => {
 
 app.post('/reset-password', async (request:Request, response: Response) => {
   const {email} = request.body;
-  if(!email) {
-    response.status(400).send({message: "User does not exist"});
+  if (!email) {
+    response.status(400).send({ message: "Email is required" });
     return;
   }
+  if(!email) {
+    response.status(400).send({message: "Email is required"});
+    return;
+  }
+  const user = await UserModel.findOne({email});
+  if(!user){
+    response.status(404).send({ message: "User does not exist" });
+    return;
+  }
+});
+
+app.post('/resend-verification', async(request:Request, response:Response)=>{
+  const {email} = request.body;
+  if (!email) {
+    response.status(400).send({ message: "Email is required" });
+    return;
+  }
+const user = await UserModel.findOne({email});
+if(!user) {
+  response.status(400).send({message:"User does not exist"})
+  return;
+} 
+
 })
+
+app.post("verify-code", async(request:Request, response:Response) =>{
+
+})
+
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
@@ -135,4 +171,19 @@ app.listen(8000, () => {
 //   );
 
 //   response.send(deleteUser);
+// });
+// app.post("/set-new-password", async (request: Request, response: Response) => {
+//   const { email, password } = request.body;
+//   if (!email || !password) {
+//     response.status(400).send({ message: "Email and password are required" });
+//     return;
+//   }
+//   const user = await UserModel.findOne({ email });
+//   if (!user) {
+//     response.status(404).send({ message: "User does not exist" });
+//     return;
+//   }
+//   const hashedPassword = await bcrypt.hash(password, 10);
+//   await UserModel.updateOne({ _id: user._id }, { password: hashedPassword, updatedAt: Date.now() });
+//   response.status(200).send({ message: "Password reset successfully" });
 // });
