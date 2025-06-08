@@ -48,15 +48,16 @@ app.post("/signup", async (request: Request, response: Response) => {
 
 app.post("/login", async (request: Request, response: Response) => {
   const { email, password } = request.body;
-  const isEmailExisted = await UserModel.findOne({ email });
-  if (!isEmailExisted) {
+  const user = await UserModel.findOne({ email });
+  if (!user) {
     response.status(400).send({ message: "User doesn't exit " });
     return;
   } else {
     const hashedPassword = await bcrypt.compareSync(
       password,
-      isEmailExisted.password!
+      user.password!
     );
+
     if (hashedPassword) {
       response.send({ message: "Successfully logged in " });
       return;
@@ -66,6 +67,20 @@ app.post("/login", async (request: Request, response: Response) => {
     }
   }
 });
+
+app.post('/reset-password', async (request:Request, response: Response) => {
+  const {email} = request.body;
+  if(!email) {
+    response.status(400).send({message: "User does not exist"});
+    return;
+  }
+})
+
+app.listen(8000, () => {
+  console.log(`running on http://localhost:8000`);
+});
+
+
 // app.get("/users", async (request: Request, response: Response) => {
 //   const users = await UserModel.find();
 //   response.send("successfully");
@@ -121,7 +136,3 @@ app.post("/login", async (request: Request, response: Response) => {
 
 //   response.send(deleteUser);
 // });
-
-app.listen(8000, () => {
-  console.log(`running on http://localhost:8000`);
-});
