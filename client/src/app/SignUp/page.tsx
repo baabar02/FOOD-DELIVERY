@@ -93,17 +93,15 @@ const SignUpPage = () => {
       });
 
       if (response.data.message === "User already existed") {
-        alert("asd");
+        alert("User already existed");
+        router.push("/SignUp")
+      } else {
+        (response.data.message === "Successfully registered")
       }
 
       console.log(response, "axios");
-
-      // if (currentStep < Components.length - 1) {
-      //   nextStep();
-      // } else {
       router.push("/");
-      //   console.log(values, "asddadas");
-      // }
+    
     },
   });
 
