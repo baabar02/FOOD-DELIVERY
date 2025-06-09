@@ -7,7 +7,6 @@ import * as Yup from "yup";
 import axios from "axios";
 import { writeFileSync } from "fs";
 import { LogIn } from "./_components/LogIn";
-import { Reset } from "./_components/Reset";
 import { Verify } from "./_components/Verify";
 
 type FormValues = {
@@ -35,10 +34,6 @@ const validationSchema = Yup.object({
 const LogInPage = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  // const Components = [LogIn, Reset, Verify];
-
-  // const prevStep = () => setCurrentStep((prev) => prev - 1);
-  // const nextStep = () => setCurrentStep((prev) => prev + 1);
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -55,14 +50,21 @@ const LogInPage = () => {
           password: values.password,
         });
         console.log(response.data.message, "axios");
+      //   if(response.data.token) {
+      //   alert("Login successful")
+      // }
+
+      localStorage.setItem("token",response.data.token);
+      localStorage.setItem("userId",response.data.userId)
         router.push("/");
       } catch (err: any) {
-        alert(err.response.data.message);
+        const errorMessage = err.response?.data?.message || "Error occured. fuuck. try again"
+        alert(errorMessage);
       }
     },
   });
 
-  // const Stepper = Components[currentStep];
+
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -74,8 +76,7 @@ const LogInPage = () => {
             onBlur={formik.handleBlur}
             touched={formik.touched}
             errors={formik.errors}
-            // prevStep={currentStep > 0 ? prevStep : undefined}
-            // nextStep={nextStep}
+         
           />
         </div>
       </form>
