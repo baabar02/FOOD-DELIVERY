@@ -13,9 +13,7 @@ import { Verify } from "./_components/Verify";
 type FormValues = {
   email: string;
   password: string;
-
 };
-
 
 export type InputPropsTypePage = {
   values: FormValues;
@@ -31,18 +29,16 @@ const validationSchema = Yup.object({
   email: Yup.string()
     .required("Email is required")
     .email("Please enter valid email address"),
-  password: Yup.string()
-    .required("Invalid password. Please try again")
-
+  password: Yup.string().required("Invalid password. Please try again"),
 });
 
 const LogInPage = () => {
   const router = useRouter();
-  const [currentStep,setCurrentStep] =useState(0);
-  const Components = [LogIn,Reset,Verify];  
+  const [currentStep, setCurrentStep] = useState(0);
+  // const Components = [LogIn, Reset, Verify];
 
-  const prevStep = () => setCurrentStep((prev) => prev - 1);
-  const nextStep = () => setCurrentStep((prev) => prev + 1);
+  // const prevStep = () => setCurrentStep((prev) => prev - 1);
+  // const nextStep = () => setCurrentStep((prev) => prev + 1);
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -53,38 +49,34 @@ const LogInPage = () => {
 
     onSubmit: async (values) => {
       console.log("asdfghjkl");
-      const response = await axios.post("http://localhost:8000/login", {
-        email: values.email,
-        password: values.password,
-      });
-      console.log(response, "axios");
-      router.push("/");
-
-      const response1 = await axios.post("http://localhost:8000/reset-password", {
-        email:values.email
-      });
-
-      const response2 = await axios.post("http://localhost:8000/resend-verification", {
-            email: values.email,
-          });
+      try {
+        const response = await axios.post("http://localhost:8000/login", {
+          email: values.email,
+          password: values.password,
+        });
+        console.log(response.data.message, "axios");
+        router.push("/");
+      } catch (err: any) {
+        alert(err.response.data.message);
+      }
     },
   });
 
-  const Stepper = Components[currentStep];
+  // const Stepper = Components[currentStep];
 
   return (
     <div className="flex justify-center items-center min-h-screen">
       <form onSubmit={formik.handleSubmit}>
         <div className="flex gap-10">
-     <Stepper
-          values={formik.values}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          touched={formik.touched}
-          errors={formik.errors}
-          prevStep={currentStep > 0 ? prevStep : undefined}
-          nextStep={nextStep}
-        />
+          <LogIn
+            values={formik.values}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            touched={formik.touched}
+            errors={formik.errors}
+            // prevStep={currentStep > 0 ? prevStep : undefined}
+            // nextStep={nextStep}
+          />
         </div>
       </form>
     </div>
@@ -92,4 +84,3 @@ const LogInPage = () => {
 };
 
 export default LogInPage;
-

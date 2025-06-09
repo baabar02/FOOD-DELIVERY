@@ -13,10 +13,9 @@ export type InputPropsType = {
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   touched: { email?: boolean };
   errors: { email?: string };
-   prevStep?: () => void;
+  prevStep?: () => void;
   nextStep?: () => void;
 };
-
 
 export const Reset = ({
   values,
@@ -24,12 +23,10 @@ export const Reset = ({
   onBlur,
   touched,
   errors,
-  prevStep
-
+  prevStep,
 }: InputPropsType) => {
   const router = useRouter();
-  const isButtonDisabled =
-    !!errors.email || !values.email;
+  const isButtonDisabled = !!errors.email || !values.email;
 
   return (
     <div className="flex gap-10 items-center justify-center mx-5 ">
@@ -40,7 +37,7 @@ export const Reset = ({
             className="bg-transparent"
             onClick={prevStep}
           >
-            <ChevronLeft size={16}/>
+            <ChevronLeft size={16} />
           </Button>
         </div>
         <div>
@@ -71,10 +68,11 @@ export const Reset = ({
               Send link
             </Button>
           </div>
-            <div className="flex">
+          <div className="flex">
             <p>Don't have an account?</p>
-            <Button variant='link'
-            onClick={()=>router.push("/signup")}>Sign up</Button>
+            <Button variant="link" onClick={() => router.push("/SignUp")}>
+              Sign up
+            </Button>
           </div>
         </div>
       </div>
