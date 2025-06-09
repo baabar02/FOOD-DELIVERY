@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import cors from "cors";
+import jwt from "jsonwebtoken";
 
 const databaseConnect = async () => {
   try {
@@ -35,11 +36,11 @@ app.get("/", async (request: Request, response: Response) => {
 });
 
 app.post("/signup", async (request: Request, response: Response) => {
-  const { email, password,firstName } = request.body;
-  if (!email || !password) {
-    response.status(400).send({ message: "Email and password are required" });
-    return;
-  }
+  const { email, password, firstName } = request.body;
+  // if (!email || !password) {
+  //   response.status(400).send({ message: "Email and password are required" });
+  //   return;
+  // }
   const isEmailExisted = await UserModel.findOne({ email });
   if (!isEmailExisted) {
     const hashedPassword = await bcrypt.hashSync(password, 10);
@@ -52,70 +53,68 @@ app.post("/signup", async (request: Request, response: Response) => {
 
 app.post("/login", async (request: Request, response: Response) => {
   const { email, password } = request.body;
-  if (!email || !password) {
-    response.status(400).send({ message: "Email and password are required" });
-    return;
-  }
+  // if (!email || !password) {
+  //   response.status(400).send({ message: "Email and password are required" });
+  //   return;
+  // }
   const user = await UserModel.findOne({ email });
   if (!user) {
-    response.status(400).send({ message: "User doesn't exit " });
+    response.status(400).send({ message: "User doesn't exist " });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.compareSync(password, user.password!);
+
+  if (hashedPassword) {
+    response.status(200).send({ message: "Successfully logged in " });
     return;
   } else {
-    const hashedPassword = await bcrypt.compareSync(
-      password,
-      user.password!
-    );
-
-    if (hashedPassword) {
-      response.send({ message: "Successfully logged in " });
-      return;
-    } else {
-      response.send({ message: " Wrong password, try again" });
-      return;
-    }
+    response.status(401).send({ message: " Wrong password, try again" });
+    return;
   }
 });
 
-app.post('/reset-password', async (request:Request, response: Response) => {
-  const {email} = request.body;
+app.post("/reset-password", async (request: Request, response: Response) => {
+  const { email } = request.body;
+
   if (!email) {
     response.status(400).send({ message: "Email is required" });
     return;
   }
-  if(!email) {
-    response.status(400).send({message: "Email is required"});
-    return;
-  }
-  const user = await UserModel.findOne({email});
-  if(!user){
+  const user = await UserModel.findOne({ email });
+  if (!user) {
     response.status(404).send({ message: "User does not exist" });
     return;
   }
 });
 
-app.post('/resend-verification', async(request:Request, response:Response)=>{
-  const {email} = request.body;
-  if (!email) {
-    response.status(400).send({ message: "Email is required" });
-    return;
+app.post(
+  "/resend-verification",
+  async (request: Request, response: Response) => {
+    const { email } = request.body;
+    if (!email) {
+      response.status(400).send({ message: "Email is required" });
+      return;
+    }
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      response.status(400).send({ message: "User does not exist" });
+      return;
+    }
   }
-const user = await UserModel.findOne({email});
-if(!user) {
-  response.status(400).send({message:"User does not exist"})
-  return;
-} 
+);
 
-})
+app.post("verify-code", async (request: Request, response: Response) => {});
 
-app.post("verify-code", async(request:Request, response:Response) =>{
-
-})
-
+// app.delete("/delete", async (req: Request, res: Response) => {
+//   const { email } = req.body;
+//   await UserModel.findOneAndDelete({ email });
+//   res.send("Amjilttai");
+// });
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
-
 
 // app.get("/users", async (request: Request, response: Response) => {
 //   const users = await UserModel.find();
