@@ -1,5 +1,3 @@
-"use client";
-
 import express, { request, Request, Response } from "express";
 import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
@@ -9,9 +7,8 @@ import jwt from "jsonwebtoken";
 
 const databaseConnect = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://baabarmx:EA6CG3oFW45UnlTB@cluster0.p7lafs3.mongodb.net/food-delivery"
-    );
+    await mongoose.connect("mongodb+srv://new:newnew@cluster0.p7lafs3.mongodb.net/food-delivery?retryWrites=true", {
+    });
     console.log("Connected to mongoDB");
   } catch (err) {
     console.log(err, "Database connection error");
@@ -59,7 +56,7 @@ app.post("/login", async (request: Request, response: Response) => {
     const user = await UserModel.findOne({ email });
     if (!user) {
       response.status(400).send({ message: "User doesn't exist " });
-      return;
+      return; 
     }
 
     if (!user.password) {
@@ -90,13 +87,16 @@ app.post("/login", async (request: Request, response: Response) => {
 });
 
 app.post("/verify", async (request: Request, response: Response) => {
+
   const { token } = request.body;
 
   const tokenPassword = "foodDelivery";
 
   const isValid = jwt.verify(token, tokenPassword);
+  
   try {
     const destructToken = jwt.decode(token);
+
     if (isValid) {
       const destructToken = jwt.decode(token);
       response.send({ destructToken });
