@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -10,6 +10,7 @@ import { Password } from "./_components/Password";
 import Right from "./_components/Rigth";
 import axios from "axios";
 import { writeFileSync } from "fs";
+import { useAuth } from "../UserProvider";
 
 type FormValues = {
   email: string;
@@ -63,7 +64,22 @@ const validationSchema = Yup.object({
 
 const SignUpPage = () => {
   const router = useRouter();
+  const {user} = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(0);
+
+useEffect(()=>{
+
+  if(user) {
+    router.push("/")
+    return;
+  }
+  
+
+},[]);
+
+if(user) {
+  return null;
+}
 
   const Components = [Left, Password];
   const Stepper = Components[currentStep];

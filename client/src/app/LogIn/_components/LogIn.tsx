@@ -77,7 +77,7 @@ export const LogIn = ({
                 type="button"
                 onClick={togglePassword}
                 aria-label={showPassword ? "Hide password" : "Show password"}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-transparent text-gray-500"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-transparent hover:bg-transparent active:bg-transparent text-gray-500 focus:outline-none focus:ring-0"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </Button>
@@ -95,18 +95,20 @@ export const LogIn = ({
           </div>
           <div>
             <Button
-              variant="ghost"
-              className="w-full rounded-md border border-gray-300 bg-gray-200"
-              // onClick={() => router.push("/")}
+              variant="default"
+              className="w-full rounded-md border border-gray-300 bg-blue-500 hover:bg-blue-600 active:bg-blue-600 text-white focus:outline-none focus:ring-0 disabled:bg-gray-700"
+            
               type="submit"
               disabled={isButtonDisabled}
             >
               Let's go
             </Button>
           </div>
-          <div className="flex">
+          <div className="flex items-center">
             <p>Don't have an account?</p>
-            <Button variant="ghost" onClick={() => router.push("/SignUp")}>
+            <Button 
+            className="text-blue-600"
+            variant="ghost" onClick={() => router.push("/SignUp")}>
               Sign up
             </Button>
           </div>

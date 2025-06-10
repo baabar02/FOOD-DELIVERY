@@ -17,6 +17,7 @@ type FormValues = {
 export type InputPropsTypePage = {
   values: FormValues;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+
   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
   touched: { email?: boolean; password?: boolean };
   errors: { email?: string; password?: string };
@@ -59,7 +60,7 @@ const LogInPage = () => {
         router.push("/");
       } catch (err: any) {
         const errorMessage =
-          err.response?.data?.message || "Error occured. fuuck. try again";
+          err.response?.data?.message || "Error occured. try again";
         alert(errorMessage);
       }
     },
