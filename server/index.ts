@@ -21,7 +21,7 @@ const databaseConnect = async () => {
 const Users = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
-  firstName: { type: String, required: true },
+  firstName: { type: String, required: false },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -54,6 +54,7 @@ app.post("/signup", async (request: Request, response: Response) => {
 app.post("/login", async (request: Request, response: Response) => {
   try {
     const { email, password } = request.body;
+    console.log(email, password);
 
     const user = await UserModel.findOne({ email });
     if (!user) {
@@ -66,11 +67,13 @@ app.post("/login", async (request: Request, response: Response) => {
         .status(500)
         .send({ messegae: " User password not found in DataBase" });
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password!);
 
     const tokenPassword = "foodDelivery";
 
     const token = jwt.sign({ userId: user._id }, tokenPassword);
+
     if (!isPasswordValid) {
       response.status(401).send({ message: " Wrong password, try again" });
       return;
@@ -86,10 +89,27 @@ app.post("/login", async (request: Request, response: Response) => {
   }
 });
 
-// app.post("/login", async (request: Request, response: Response) => {
-//   console.log("Request body:", request.body);
-//   response.status(200).send({ message: "Test response" });
-// });
+app.post("/verify", async (request: Request, response: Response) => {
+  const { token } = request.body;
+
+  const tokenPassword = "foodDelivery";
+
+  const isValid = jwt.verify(token, tokenPassword);
+  try {
+    const destructToken = jwt.decode(token);
+    if (isValid) {
+      const destructToken = jwt.decode(token);
+      response.send({ destructToken });
+      return;
+    } else {
+      response.status(401).send({ message: "token is not valid" });
+      return;
+    }
+  } catch (err) {
+    response.status(401).send({ message: "token is not valid" });
+    return;
+  }
+});
 
 app.post("/reset-password", async (request: Request, response: Response) => {
   const { email } = request.body;
