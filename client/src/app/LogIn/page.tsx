@@ -50,21 +50,20 @@ const LogInPage = () => {
           password: values.password,
         });
         console.log(response.data.message, "axios");
-      //   if(response.data.token) {
-      //   alert("Login successful")
-      // }
+        if (response.data.token) {
+          alert("Login successful");
+        }
 
-      localStorage.setItem("token",response.data.token);
-      localStorage.setItem("userId",response.data.userId)
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userId", response.data.userId);
         router.push("/");
       } catch (err: any) {
-        const errorMessage = err.response?.data?.message || "Error occured. fuuck. try again"
+        const errorMessage =
+          err.response?.data?.message || "Error occured. fuuck. try again";
         alert(errorMessage);
       }
     },
   });
-
-
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -76,7 +75,6 @@ const LogInPage = () => {
             onBlur={formik.handleBlur}
             touched={formik.touched}
             errors={formik.errors}
-         
           />
         </div>
       </form>
