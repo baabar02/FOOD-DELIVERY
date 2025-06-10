@@ -94,7 +94,7 @@ const SignUpPage = () => {
 
       if (response.data.message === "User already existed") {
         alert("User already existed");
-        router.push("/SignUp");
+        // router.push("/SignUp");
       } else {
         response.data.message === "Successfully registered";
       }

@@ -8,7 +8,8 @@ import {
   useState,
 } from "react";
 
-import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 type UserData = {
   userId: string;
@@ -21,16 +22,27 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({ user: null });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const router = useRouter();
   const [user, setUser] = useState<UserData | null>(null);
+
+  const tokenChecker = async (token: string) => {
+    try {
+      const response = await axios.post("http://localhost:8000/verify", {
+        token: token,
+      });
+      setUser({ userId: response.data.destructToken.userId });
+    } catch (err) {
+      router.push("/LogIn");
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
 
     if (token) {
-      console.log(token, "kk");
-      // const decoded = jwtDecode<UserData>(token);
-      // setUser(decoded);
+      tokenChecker(token);
+    } else {
+      // router.push("/LogIn");
     }
   }, []);
 
@@ -39,4 +51,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// export const useAuth = () => useContext<AuthContextType>(AuthContext);
+export const useAuth = () => useContext<AuthContextType>(AuthContext);

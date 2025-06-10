@@ -1,24 +1,15 @@
 "use client";
 
-import { useContext, useEffect } from "react";
-// import { AuthContext, useAuth } from "./UserProvider";
-// const {user} = useAuth();
-// console.log(user?.userId, "hh");
+import { useAuth } from "./UserProvider";
 
-// const context = useContext(AuthContext);
-// const {user} = context
 const Home = () => {
+  const { user } = useAuth();
   return (
     <div className="text-2xl">
-      {/* {user?.userId} */}
+      {user?.userId}
       Hello
     </div>
   );
 };
 
 export default Home;
-
-//   useEffect(()=>{
-//     const token = localStorage.getItem("token")
-//  console.log("token",token);
-//   },[])
