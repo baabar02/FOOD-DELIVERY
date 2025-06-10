@@ -1,3 +1,5 @@
+"use client";
+
 import express, { request, Request, Response } from "express";
 import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
@@ -11,7 +13,6 @@ const databaseConnect = async () => {
       "mongodb+srv://baabarmx:EA6CG3oFW45UnlTB@cluster0.p7lafs3.mongodb.net/food-delivery"
     );
     console.log("Connected to mongoDB");
-    
   } catch (err) {
     console.log(err, "Database connection error");
   }
@@ -50,48 +51,45 @@ app.post("/signup", async (request: Request, response: Response) => {
   response.send({ message: "User already existed" });
 });
 
-// app.post("/login", async (request: Request, response: Response) => {
-//   try{
-//   const { email, password } = request.body;
-
-//   const user = await UserModel.findOne({ email });
-//   if (!user) {
-//     response.status(400).send({ message: "User doesn't exist " });
-//     return;
-//   }
-
-//   if(!user.password) {
-//     response.status(500).send({messegae:" User password not found in DataBase"})
-//   }
-//   const isPasswordValid = await bcrypt.compare(password, user.password!);
-
-//   const tokenPassword = "foodDelivery"
-
-//  const token = jwt.sign({userId: user._id }, tokenPassword);
-//   if (!isPasswordValid) {
-    
-//     response.status(401).send({ message: " Wrong password, try again" });
-//     return; 
-   
-//   } else {
-//     response.status(200).send({ message: "Successfully logged in ", token, userID: user?._id});
-//     return;
-//   }
-    
-//   } catch (error){
-//     console.log(error," Login error");
-//     response.status(500).send({message:"Server error"})
-  
-//   }
-
-// });
-
-
 app.post("/login", async (request: Request, response: Response) => {
-  console.log("Request body:", request.body);
-  response.status(200).send({ message: "Test response" });
+  try {
+    const { email, password } = request.body;
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      response.status(400).send({ message: "User doesn't exist " });
+      return;
+    }
+
+    if (!user.password) {
+      response
+        .status(500)
+        .send({ messegae: " User password not found in DataBase" });
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password!);
+
+    const tokenPassword = "foodDelivery";
+
+    const token = jwt.sign({ userId: user._id }, tokenPassword);
+    if (!isPasswordValid) {
+      response.status(401).send({ message: " Wrong password, try again" });
+      return;
+    } else {
+      response
+        .status(200)
+        .send({ message: "Successfully logged in ", token, userID: user?._id });
+      return;
+    }
+  } catch (error) {
+    console.log(error, " Login error");
+    response.status(500).send({ message: "Server error" });
+  }
 });
 
+// app.post("/login", async (request: Request, response: Response) => {
+//   console.log("Request body:", request.body);
+//   response.status(200).send({ message: "Test response" });
+// });
 
 app.post("/reset-password", async (request: Request, response: Response) => {
   const { email } = request.body;
@@ -134,7 +132,3 @@ app.delete("/delete", async (req: Request, res: Response) => {
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
-
-
-
-
