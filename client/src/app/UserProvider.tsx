@@ -21,7 +21,10 @@ type AuthContextType = {
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
 };
 
-export const AuthContext = createContext<AuthContextType>({ user: null, setUser: () => {} });
+export const AuthContext = createContext<AuthContextType>({
+  user: null,
+  setUser: () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
@@ -35,8 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser({ userId: response.data.destructToken.userId });
     } catch (err) {
       console.log("Token verification failed", err);
-      
-      router.push("/LogIn");
+
+      // router.push("/LogIn");
     }
   };
 
@@ -44,18 +47,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const token = localStorage.getItem("token");
 
     if (token) {
-
       tokenChecker(token);
     } else {
-      router.push("/LogIn");
+      // router.push("/LogIn");
     }
   }, []);
 
   return (
     <AuthContext.Provider value={{ user, setUser }}>
-      <div style={{backgroundColor : "#f0f0f0", minHeight: "100vh" }}>
-      {children}
-      </div></AuthContext.Provider>
+      <div style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
+        {children}
+      </div>
+    </AuthContext.Provider>
   );
 };
 
