@@ -7,8 +7,10 @@ import jwt from "jsonwebtoken";
 
 const databaseConnect = async () => {
   try {
-    await mongoose.connect("mongodb+srv://new:newnew@cluster0.p7lafs3.mongodb.net/food-delivery?retryWrites=true", {
-    });
+    await mongoose.connect(
+      "mongodb+srv://new:newnew@cluster0.p7lafs3.mongodb.net/food-delivery?retryWrites=true",
+      {}
+    );
     console.log("Connected to mongoDB");
   } catch (err) {
     console.log(err, "Database connection error");
@@ -56,7 +58,7 @@ app.post("/login", async (request: Request, response: Response) => {
     const user = await UserModel.findOne({ email });
     if (!user) {
       response.status(400).send({ message: "User doesn't exist " });
-      return; 
+      return;
     }
 
     if (!user.password) {
@@ -87,13 +89,12 @@ app.post("/login", async (request: Request, response: Response) => {
 });
 
 app.post("/verify", async (request: Request, response: Response) => {
-
   const { token } = request.body;
 
   const tokenPassword = "foodDelivery";
 
   const isValid = jwt.verify(token, tokenPassword);
-  
+
   try {
     const destructToken = jwt.decode(token);
 
@@ -108,6 +109,22 @@ app.post("/verify", async (request: Request, response: Response) => {
   } catch (err) {
     response.status(401).send({ message: "token is not valid" });
     return;
+  }
+});
+
+app.post("/user", async (request: Request, response: Response) => {
+  const { userName, password } = request.body;
+  console.log(userName);
+
+  const user = await UserModel.findOne({ userName });
+  const isUserExisted = await UserModel.findOne({ userName });
+  if (!isUserExisted) {
+    const codedPassword = await bcrypt.hashSync(password, 3);
+    await UserModel.create({ userName, password: codedPassword });
+    response.status(200).send("successfully registered");
+    return;
+  } else {
+    response.send("User name already existed");
   }
 });
 
