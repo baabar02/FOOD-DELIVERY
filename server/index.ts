@@ -4,6 +4,7 @@ import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import nodemailer from "nodemailer";
 
 const databaseConnect = async () => {
   try {
@@ -83,7 +84,7 @@ app.post("/login", async (request: Request, response: Response) => {
       return;
     }
   } catch (error) {
-    console.log(error, " Login error");
+    console.log(error, "Login error");
     response.status(500).send({ message: "Server error" });
   }
 });
@@ -109,22 +110,6 @@ app.post("/verify", async (request: Request, response: Response) => {
   } catch (err) {
     response.status(401).send({ message: "token is not valid" });
     return;
-  }
-});
-
-app.post("/user", async (request: Request, response: Response) => {
-  const { userName, password } = request.body;
-  console.log(userName);
-
-  const user = await UserModel.findOne({ userName });
-  const isUserExisted = await UserModel.findOne({ userName });
-  if (!isUserExisted) {
-    const codedPassword = await bcrypt.hashSync(password, 3);
-    await UserModel.create({ userName, password: codedPassword });
-    response.status(200).send("successfully registered");
-    return;
-  } else {
-    response.send("User name already existed");
   }
 });
 
@@ -166,6 +151,74 @@ app.delete("/delete", async (req: Request, res: Response) => {
   res.send("Amjilttai");
 });
 
+app.get("/email", async (request: Request, response: Response) => {
+  const transport = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "baabarmx@gmail.com",
+      pass: "yignruoqpvxgluyq",
+    },
+  });
+
+  const options = {
+    from: "baabarmx@gmail.com",
+    to: "baabar_mx@yahoo.com",
+    subject: "Hellooo",
+    text: "testing",
+  };
+
+  await transport.sendMail(options);
+
+  app.post("/sendOtp", async (request: Request, response: Response) => {
+    // check email db
+  });
+
+  app.post("checkOtp", async (request: Request, response: Response) => {});
+});
+
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
+
+// app.post("/user", async (request: Request, response: Response) => {
+//   const { userName, password } = request.body;
+//   console.log(userName);
+
+//   const user = await UserModel.findOne({ userName });
+//   const isUserExisted = await UserModel.findOne({ userName });
+//   if (!isUserExisted) {
+//     const codedPassword = await bcrypt.hashSync(password, 3);
+//     await UserModel.create({ userName, password: codedPassword });
+//     response.status(200).send("successfully registered");
+//     return;
+//   } else {
+//     response.send("User name already existed");
+//   }
+// });
+
+// app.post("/userLogIn", async (request: Request, response: Response) => {
+//   try {
+//     const { userName, password } = request.body;
+
+//     const user = await UserModel.findOne({ userName });
+//     if (!user) {
+//       response.send({ message: "user does not exist" });
+//       return;
+//     }
+//     if (!password) {
+//       response.send({ message: "password does not match" });
+//       return;
+//     }
+//     const isPasswordValid = await bcrypt.compare(password, user.password!);
+
+//     if (!isPasswordValid) {
+//       response.send({ message: "wrong password, try again" });
+//       return;
+//     }
+//   } catch (err) {
+//     response.send({ err: "Server error" });
+//   }
+// });
