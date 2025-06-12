@@ -5,6 +5,12 @@ import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import { string } from "yup";
+
+
+const app = express();
+app.use(express.json());
+app.use(cors());
 
 const databaseConnect = async () => {
   try {
@@ -18,21 +24,33 @@ const databaseConnect = async () => {
   }
 };
 
+
+
 const Users = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   firstName: { type: String, required: false },
+  otp: {type: String },
+  otpExpires: { type: Date},
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const UserModel = model("Users", Users);
 
-const app = express();
-app.use(express.json());
-app.use(cors());
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "baabarmx@gmail.com",
+      pass: "yignruoqpvxgluyq",
+    },
+  });
 
 databaseConnect();
+
 
 app.get("/", async (request: Request, response: Response) => {
   response.send("Hello world");
@@ -45,7 +63,7 @@ app.post("/signup", async (request: Request, response: Response) => {
   if (!isEmailExisted) {
     const hashedPassword = await bcrypt.hashSync(password, 10);
     await UserModel.create({ email, password: hashedPassword });
-    response.send({ messege: "Successfully registered" });
+    response.send({ message: "Successfully registered" });
     return;
   }
   response.send({ message: "User already existed" });
@@ -65,7 +83,7 @@ app.post("/login", async (request: Request, response: Response) => {
     if (!user.password) {
       response
         .status(500)
-        .send({ messegae: " User password not found in DataBase" });
+        .send({ message: " User password not found in DataBase" });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password!);
@@ -113,23 +131,9 @@ app.post("/verify", async (request: Request, response: Response) => {
   }
 });
 
-app.post("/reset-password", async (request: Request, response: Response) => {
-  const { email } = request.body;
 
-  if (!email) {
-    response.status(400).send({ message: "Email is required" });
-    return;
-  }
-  const user = await UserModel.findOne({ email });
-  if (!user) {
-    response.status(404).send({ message: "User does not exist" });
-    return;
-  }
-});
 
-app.post(
-  "/resend-verification",
-  async (request: Request, response: Response) => {
+app.post("/resend-verification", async (request: Request, response: Response) => {
     const { email } = request.body;
     if (!email) {
       response.status(400).send({ message: "Email is required" });
@@ -140,10 +144,11 @@ app.post(
       response.status(400).send({ message: "User does not exist" });
       return;
     }
+    response.send({ message: "Verification email resent" });
   }
 );
 
-app.post("verify-code", async (request: Request, response: Response) => {});
+
 
 app.delete("/delete", async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -151,7 +156,9 @@ app.delete("/delete", async (req: Request, res: Response) => {
   res.send("Amjilttai");
 });
 
-app.get("/email", async (request: Request, response: Response) => {
+
+
+app.post("/email", async (request: Request, response: Response) => {
   const transport = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -172,53 +179,88 @@ app.get("/email", async (request: Request, response: Response) => {
 
   await transport.sendMail(options);
 
+});
+
   app.post("/sendOtp", async (request: Request, response: Response) => {
-    // check email db
+    const {email} = request.body;
+    if(!email) {
+      response.status(400).send({message:"Email is required"})
+      return;
+    }
+
+    const user = await UserModel.findOne({email});
+
+    if(!user) {
+      response.send("User does not exist")
+      return; 
+    } 
+
+    const otp = Math.floor(100000 + Math.random() * 90000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+  const options = {
+    from: "baabarmx@gmail.com",
+    to: "baabar_mx@yahoo.com",
+    subject: "Your OTP code",
+    text:`your OTP code is, ${otp}, "It expires 10 minutes"`
+    }
+
+  await transporter.sendMail(options)
+    response.send("OTP sent to email")
   });
 
-  app.post("checkOtp", async (request: Request, response: Response) => {});
+  app.post("checkOtp", async (request: Request, response: Response) => {
+    const {email, otp} = request.body;
+    if(!email || !otp) {
+      response.send({message:"Email and OTP are required"})
+      return;
+    }
+    const user = await UserModel.findOne({email});
+    if(!user) {
+      response.send({message:"Invalid or expired OTP"});
+      return;
+    }
+    user.otp = undefined;
+    user.otpExpires = undefined;
+
+    await user.save();
+    response.send({message: "OTP verified successfully"})
+    
+  });
+
+  app.post("/reset-password", async (request: Request, response: Response) => {
+  const { email, newPassword } = request.body;
+
+  if (!email || !newPassword) {
+    response.status(400).send({ message: "Email and new password are required" });
+    return;
+  }
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    response.status(404).send({ message: "User does not exist" });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+
+  await user.save();
+
 });
+
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
 
-// app.post("/user", async (request: Request, response: Response) => {
-//   const { userName, password } = request.body;
-//   console.log(userName);
 
-//   const user = await UserModel.findOne({ userName });
-//   const isUserExisted = await UserModel.findOne({ userName });
-//   if (!isUserExisted) {
-//     const codedPassword = await bcrypt.hashSync(password, 3);
-//     await UserModel.create({ userName, password: codedPassword });
-//     response.status(200).send("successfully registered");
-//     return;
-//   } else {
-//     response.send("User name already existed");
-//   }
-// });
 
-// app.post("/userLogIn", async (request: Request, response: Response) => {
-//   try {
-//     const { userName, password } = request.body;
 
-//     const user = await UserModel.findOne({ userName });
-//     if (!user) {
-//       response.send({ message: "user does not exist" });
-//       return;
-//     }
-//     if (!password) {
-//       response.send({ message: "password does not match" });
-//       return;
-//     }
-//     const isPasswordValid = await bcrypt.compare(password, user.password!);
 
-//     if (!isPasswordValid) {
-//       response.send({ message: "wrong password, try again" });
-//       return;
-//     }
-//   } catch (err) {
-//     response.send({ err: "Server error" });
-//   }
-// });
+
+
