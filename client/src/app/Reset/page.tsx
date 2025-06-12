@@ -8,6 +8,15 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
+import Right from "../LogIn/_components/Right";
+
+interface FormValues {
+  email: string;
+  otp?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -17,8 +26,11 @@ const validationSchema = Yup.object({
 
 const ResetPage = () => {
   const router = useRouter();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const formik = useFormik({
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       email: "",
     },
@@ -26,19 +38,25 @@ const ResetPage = () => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(
-          "http://localhost:8000/reset-password",
+          "http://localhost:8000/sendOtp",
           {
             email: values.email,
           }
         );
-        alert("Reset link sent to your email.");
+        setSuccess("OTP sent to your email. Redirecting to verify...");
+        setTimeout(() => router.push(`/Verify?email=${values.email}`), 2000);
+
+        // alert("Reset link sent to your email.");
       } catch (err: any) {
-        const errorMessage =
-          err.response?.data?.message || "An error occurred. Please try again.";
-        alert(errorMessage);
+      
+         setError(err.response?.data?.message || "An error occurred. Please try again.");
+        // alert(errorMessage);
       }
     },
   });
+
+  const isButtonDisabled =
+    !!formik.errors.email || !formik.values.email.trim() || formik.isSubmitting;
 
   return (
     <div className="flex gap-10 items-center justify-center mx-5">
@@ -60,6 +78,8 @@ const ResetPage = () => {
           <p className="text-2xl">Reset your password</p>
           <p>Enter your email to receive a password reset link.</p>
         </div>
+        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {success && <div className="text-green-500 text-sm">{success}</div>}
         <div className="flex flex-col gap-4">
           <Input
             name="email"
@@ -74,10 +94,10 @@ const ResetPage = () => {
             <div className="text-red-500 text-sm">{formik.errors.email}</div>
           )}
           <Button
-            name="reset"
+            
             type="submit"
-            onClick={() => router.push("/Verify")}
             className="w-full rounded-md border border-gray-300 bg-gray-200"
+            disabled={isButtonDisabled}
           >
             Send link
           </Button>
@@ -93,7 +113,7 @@ const ResetPage = () => {
           </div>
         </div>
       </form>
-      {/* You mentioned <Right />, but it's not defined — omit or add definition if needed */}
+<Right/>
     </div>
   );
 };

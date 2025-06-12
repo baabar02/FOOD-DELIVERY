@@ -11,7 +11,7 @@ const Home = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    setUser(null); // hereglegchiig page ees gargaj baigaa command n ene
     router.push("/LogIn");
   };
 

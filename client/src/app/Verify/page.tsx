@@ -5,39 +5,65 @@ import { Input } from "@/components/ui/input";
 import Right from "../SignUp/_components/Rigth";
 import { ChevronLeft } from "lucide-react";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as Yup from "yup";
 import axios from "axios";
+import { useState } from "react";
 
 const validationSchema = Yup.object({
-  email: Yup.string()
-    .required("Email is required")
-    .email("Please enter a valid email address"),
+  otp: Yup.string()
+    .required("OTP is required")
+    .matches(/^\d{6}$/, "OTP must be a 6-digit number"),
 });
 
 const VerifyPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const email = searchParams.get("email");
+
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      otp: "",
     },
     validationSchema,
     onSubmit: async (values) => {
+      if (!email) {
+        setError("Email is missing. Please start the reset process again.");
+        return;
+      }
+      
       try {
-        await axios.post("http://localhost:8000/verify", {
-          email: values.email,
+        await axios.post("http://localhost:8000/sendOtp", {
+          email,
+          otp:values.otp
         });
-        alert("Verification email resent.");
+       setSuccess("OTP verified!");
+        setTimeout(() => router.push(`/NewPassword?email=${email}`), 2000);
+
       } catch (err: any) {
-        const errorMessage =
-          err.response?.data?.message || "An error occurred. Please try again.";
-        alert(errorMessage);
+      
+          setError(err.response?.data?.message || "An error occurred. Please try again.");
+        // alert(errorMessage);
       }
     },
   });
 
-  const isButtonDisabled = !!formik.errors.email || !formik.values.email.trim();
+
+  const handleResend = async () =>{
+    try{
+ await axios.post("http://localhost:8000/sendOtp", {email})
+    setSuccess("Verification OTP resent to your email.")
+    } catch (err:any) {
+      setError(err.response?.data?.message || "An error occurred.");
+    }
+   
+  }
+   
+
+  const isButtonDisabled = !!formik.errors.otp || !formik.values.otp.trim();
 
   return (
     <div className="flex gap-10 items-center justify-center mx-5">
@@ -58,34 +84,39 @@ const VerifyPage = () => {
         <div>
           <p className="text-2xl">Please verify your email</p>
           <p>
-            We just sent a verification email to{" "}
-            <strong>{formik.values.email || "your email"}</strong>.
+           We sent a 6-digit OTP to <strong>{email || "your email"}</strong>.
             <br />
-            Click the link in the email to verify your account.
+            Enter the OTP below to verify.
           </p>
         </div>
 
         <Input
-          name="Otp"
-          type="Otp"
-          placeholder="Otp"
-          value={formik.values.email}
+          name="otp"
+          type="text"
+          placeholder="Enter 6 digit OTP"
+          value={formik.values.otp}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           className="w-full rounded-md"
         />
-        {formik.touched.email && formik.errors.email && (
-          <div className="text-red-500 text-sm">{formik.errors.email}</div>
+        {formik.touched.otp && formik.errors.otp && (
+          <div className="text-red-500 text-sm">{formik.errors.otp}</div>
         )}
-
+        <Button
+          type="submit"
+          className="w-full rounded-md border border-gray-300 bg-gray-200"
+          disabled={isButtonDisabled}
+        >
+          Verify OTP
+        </Button>
         <div>
           <Button
-            type="submit"
-            onClick={() => router.push("/SignUp/Password")}
+            type="button"
+            onClick={handleResend}
             className="w-full rounded-md border border-gray-300 bg-gray-200"
             disabled={isButtonDisabled}
           >
-            Resend email
+            Resend OTP
           </Button>
         </div>
       </form>
