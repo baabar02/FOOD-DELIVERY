@@ -7,7 +7,8 @@ import * as Yup from "yup";
 import axios from "axios";
 import { writeFileSync } from "fs";
 import { LogIn } from "./_components/LogIn";
-import { Verify } from "./_components/Verify";
+import VerifyPage from "../Verify/page";
+import Reset from "../Reset/page";
 
 type FormValues = {
   email: string;

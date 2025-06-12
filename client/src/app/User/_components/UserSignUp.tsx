@@ -5,19 +5,25 @@ import { error } from "console";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { UserProps } from "../page";
+import { useRouter } from "next/navigation";
 
 const userNameProps = {
   name: "userName",
   placeholder: "Enter your user name",
 };
 
-export const UserIn = ({
+export const UserSignUp = ({
   values,
   onChange,
   touched,
   onBlur,
   errors,
 }: UserProps) => {
+  const router = useRouter();
+
+  const isButtonDisabled =
+    !errors.userName || !errors.password || !errors.confirmPassword;
+
   return (
     <div className="flex gap-10 items-center justify-center mx-5">
       <div className="flex flex-col w-[416px] h-[288px] gap-4 shadow-md">
@@ -68,6 +74,8 @@ export const UserIn = ({
         <div>
           {
             <Button
+              disabled={isButtonDisabled}
+              onClick={() => router.push("/userLogIn")}
               variant="ghost"
               className="w-full rounded-2 border border-color-gray-50 bg-color-gray-300"
             >

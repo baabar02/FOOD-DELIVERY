@@ -1,13 +1,13 @@
 "use client";
 
-import { UserIn } from "./_components/UserIn";
+import { UserSignUp } from "./_components/UserSignUp";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import React from "react";
 import { error } from "console";
 import axios from "axios";
 import { Password } from "../SignUp/_components/Password";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type FormValues = {
   userName: string;
@@ -58,7 +58,7 @@ const UserPage = () => {
         password: values.password,
         confirmPassword: values.confirmPassword,
       });
-      console.log(response.data.message);
+      console.log(response.data.message, "axx");
       if (response.data.message === "successfully registered") {
         router.push("/");
       } else {
@@ -68,7 +68,7 @@ const UserPage = () => {
 
   return (
     <div>
-      <UserIn
+      <UserSignUp
         values={formik.values}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}

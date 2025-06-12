@@ -87,7 +87,7 @@ export const LogIn = ({
           <div className="flex justify-between">
             <Button
               variant="link"
-              // onClick={()=>router.push("/forgot")}
+              onClick={() => router.push("/Reset")}
               className="text-blue-600 underline"
             >
               Forgot password?
@@ -97,7 +97,6 @@ export const LogIn = ({
             <Button
               variant="default"
               className="w-full rounded-md border border-gray-300 bg-blue-500 hover:bg-blue-600 active:bg-blue-600 text-white focus:outline-none focus:ring-0 disabled:bg-gray-700"
-            
               type="submit"
               disabled={isButtonDisabled}
             >
@@ -106,9 +105,11 @@ export const LogIn = ({
           </div>
           <div className="flex items-center">
             <p>Don't have an account?</p>
-            <Button 
-            className="text-blue-600"
-            variant="ghost" onClick={() => router.push("/SignUp")}>
+            <Button
+              className="text-blue-600"
+              variant="ghost"
+              onClick={() => router.push("/SignUp")}
+            >
               Sign up
             </Button>
           </div>
