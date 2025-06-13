@@ -2,18 +2,19 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Right from "../../SignUp/_components/Rigth";
+import Right from "@/app/LogIn/_components/Right";
 import { ChevronLeft } from "lucide-react";
 import { useFormik } from "formik";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import * as Yup from "yup";
 import axios from "axios";
 import { useState } from "react";
 
-type FormValues = {
+interface VerifyPageProps {
   email: string;
-  password: string;
-};
+  nextStep: () => void;
+  prevStep: () => void;
+}
 
 const validationSchema = Yup.object({
   otp: Yup.string()
@@ -21,44 +22,40 @@ const validationSchema = Yup.object({
     .matches(/^\d{6}$/, "OTP must be a 6-digit number"),
 });
 
-export const VerifyPage = () => {
+export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const email = searchParams.get("email");
 
   const formik = useFormik({
-    initialValues: {
-      otp: "",
-    },
+    initialValues: { otp: "" },
     validationSchema,
     onSubmit: async (values) => {
       if (!email) {
         setError("Email is missing. Please start the reset process again.");
         return;
       }
-
       try {
-        await axios.post("http://localhost:8000/sendOtp", {
+        await axios.post("http://localhost:8000/checkOtp", {
           email,
           otp: values.otp,
         });
-        setSuccess("OTP verified!");
-        setTimeout(() => router.push(`/NewPassword?email=${email}`), 2000);
+        setSuccess("OTP verified! Redirecting...");
+        setTimeout(() => nextStep(), 2000); // Advance to NewPassword
       } catch (err: any) {
-        setError(
-          err.response?.data?.message || "An error occurred. Please try again."
-        );
-        // alert(errorMessage);
+        setError(err.response?.data?.message || "An error occurred. Please try again.");
       }
     },
   });
 
   const handleResend = async () => {
+    if (!email) {
+      setError("Email is missing. Please start the reset process again.");
+      return;
+    }
     try {
       await axios.post("http://localhost:8000/sendOtp", { email });
-      setSuccess("Verification OTP resent to your email.");
+      setSuccess("OTP resent to your email.");
     } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred.");
     }
@@ -77,7 +74,7 @@ export const VerifyPage = () => {
             variant="outline"
             className="bg-transparent"
             type="button"
-            onClick={() => router.back()}
+            onClick={prevStep} // Go back to ResetPage
           >
             <ChevronLeft size={16} />
           </Button>
@@ -90,7 +87,8 @@ export const VerifyPage = () => {
             Enter the OTP below to verify.
           </p>
         </div>
-
+        {error && <div className="text-red-500 text-sm">{error}</div>}
+        {success && <div className="text-green-500 text-sm">{success}</div>}
         <Input
           name="otp"
           type="text"
@@ -106,20 +104,17 @@ export const VerifyPage = () => {
         <Button
           type="submit"
           className="w-full rounded-md border border-gray-300 bg-gray-200"
-          disabled={isButtonDisabled}
+          disabled={isButtonDisabled || formik.isSubmitting}
         >
-          Verify OTP
+          {formik.isSubmitting ? "Verifying..." : "Verify OTP"}
         </Button>
-        <div>
-          <Button
-            type="button"
-            onClick={handleResend}
-            className="w-full rounded-md border border-gray-300 bg-gray-200"
-            disabled={isButtonDisabled}
-          >
-            Resend OTP
-          </Button>
-        </div>
+        <Button
+          type="button"
+          onClick={handleResend}
+          className="w-full rounded-md border border-gray-300 bg-gray-200"
+        >
+          Resend OTP
+        </Button>
       </form>
       <Right />
     </div>

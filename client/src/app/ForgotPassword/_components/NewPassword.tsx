@@ -2,71 +2,76 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { InputPropsType } from "../../SignUp/page";
 import Right from "../../SignUp/_components/Rigth";
-import { Check } from "lucide-react";
-import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import * as Yup from "yup";
+import { useState } from "react";
 import { useFormik } from "formik";
+import * as Yup from "yup";
 import axios from "axios";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+
+interface NewPasswordProps {
+  email: string;
+  prevStep: () => void;
+}
 
 const validationSchema = Yup.object({
   password: Yup.string()
-    .required("Email is required")
+    .required("Password is required")
     .min(4, "Password must be at least 4 characters")
     .matches(/[a-zA-Z]/, "Password must contain letters")
     .matches(/[0-9]/, "Password must contain numbers"),
-
   confirmPassword: Yup.string()
     .required("Confirm password is required")
     .oneOf([Yup.ref("password")], "Passwords must match"),
 });
 
-export const NewPassword = () => {
+export const NewPassword = ({ email, prevStep }: NewPasswordProps) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [success, setSuccess] = useState("");
-  const searchParams = useSearchParams();
   const [error, setError] = useState("");
-  const email = searchParams.get("email");
 
   const formik = useFormik({
-    initialValues: {
-      password: "",
-      confirmPassword: "",
-    },
+    initialValues: { password: "", confirmPassword: "" },
     validationSchema,
     onSubmit: async (values) => {
       if (!email) {
         setError("Email is missing. Please start the reset process again.");
         return;
       }
-
-      await axios.post("http://localhost:8000/reset-password"),
-        {
+      try {
+        await axios.post("http://localhost:8000/reset-password", {
           email,
-          NewPassword: values.password,
-        };
-      setSuccess("Password reset successfully! Redirecting to login...");
-      setTimeout(() => router.push("/LogIn"), 2000);
+          newPassword: values.password,
+        });
+        setSuccess("Password reset successfully! Redirecting to login...");
+        setTimeout(() => router.push("/LogIn"), 2000);
+      } catch (err: any) {
+        setError(err.response?.data?.message || "An error occurred. Please try again.");
+      }
     },
   });
 
   const isButtonDisabled =
     !!formik.errors.password ||
     !!formik.errors.confirmPassword ||
-    !formik.values.password;
+    !formik.values.password ||
+    !formik.values.confirmPassword ||
+    formik.isSubmitting;
 
   return (
-    <div className="flex gap-10 items-center justify-center mx-5 ">
-      <div className="flex flex-col w-[416px] h-[372px] shadow-md gap-4">
+    <div className="flex gap-10 items-center justify-center mx-5">
+      <form
+        onSubmit={formik.handleSubmit}
+        className="flex flex-col w-[416px] h-[372px] shadow-md gap-4"
+      >
         <div>
           <Button
             variant="outline"
             className="bg-transparent"
-            onClick={() => router.back()}
+            type="button"
+            onClick={prevStep} // Go back to VerifyPage
           >
             Back
           </Button>
@@ -93,41 +98,34 @@ export const NewPassword = () => {
           {formik.touched.password && formik.errors.password && (
             <div className="text-red-500 text-sm">{formik.errors.password}</div>
           )}
-
           <Input
             name="confirmPassword"
             type={showPassword ? "text" : "password"}
-            placeholder="Confirm your password"
+            placeholder="Password again"
             value={formik.values.confirmPassword}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className="w-full rounded-md"
           />
           {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-            <div className="text-red-500 text-sm">
-              {formik.errors.confirmPassword}
-            </div>
+            <div className="text-red-500 text-sm">{formik.errors.confirmPassword}</div>
           )}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Checkbox
               checked={showPassword}
               onCheckedChange={() => setShowPassword(!showPassword)}
             />
-
             <p>Show password</p>
           </div>
-          <div>
-            <Button
-              type="submit"
-              variant="ghost"
-              className="w-full rounded-md border border-gray-300 bg-gray-200"
-              disabled={isButtonDisabled}
-            >
-              {formik.isSubmitting ? "Submitting..." : "Submit"}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full rounded-md border border-gray-300 bg-gray-200"
+            disabled={isButtonDisabled}
+          >
+            {formik.isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
         </div>
-      </div>
+      </form>
       <Right />
     </div>
   );

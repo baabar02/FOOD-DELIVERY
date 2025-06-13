@@ -1,26 +1,19 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Right from "../../LogIn/_components/Right";
+import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ChevronLeft } from "lucide-react";
-import Right from "../../LogIn/_components/Right";
 
-interface FormValues {
-  email: string;
-  otp?: string;
-  password?: string;
-  confirmPassword?: string;
+interface ResetPageProps {
+  nextStep: () => void;
+  setEmail: (email: string) => void;
 }
-
-type ResetPageProps = {
-  nextStep?: () => void;
-  prevStep?: () => void;
-};
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -28,29 +21,22 @@ const validationSchema = Yup.object({
     .email("Please enter a valid email address"),
 });
 
-export const ResetPage = ({ prevStep, nextStep }: ResetPageProps) => {
+export const ResetPage = ({ nextStep, setEmail }: ResetPageProps) => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const formik = useFormik<FormValues>({
-    initialValues: {
-      email: "",
-    },
+  const formik = useFormik({
+    initialValues: { email: "" },
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post("http://localhost:8000/sendOtp", {
-          email: values.email,
-        });
-        setSuccess("OTP sent to your email. Redirecting to verify...");
-
-        // alert("Reset link sent to your email.");
+        await axios.post("http://localhost:8000/sendOtp", { email: values.email });
+        setSuccess("OTP sent to your email.");
+        setEmail(values.email); // Store email for next steps
+        setTimeout(() => nextStep(), 2000); // Advance to VerifyPage
       } catch (err: any) {
-        setError(
-          err.response?.data?.message || "An error occurred. Please try again."
-        );
-        // alert(errorMessage);
+        setError(err.response?.data?.message || "An error occurred. Please try again.");
       }
     },
   });
@@ -76,7 +62,7 @@ export const ResetPage = ({ prevStep, nextStep }: ResetPageProps) => {
         </div>
         <div>
           <p className="text-2xl">Reset your password</p>
-          <p>Enter your email to receive a password reset link.</p>
+          <p>Enter your email to receive an OTP.</p>
         </div>
         {error && <div className="text-red-500 text-sm">{error}</div>}
         {success && <div className="text-green-500 text-sm">{success}</div>}
@@ -97,9 +83,8 @@ export const ResetPage = ({ prevStep, nextStep }: ResetPageProps) => {
             type="submit"
             className="w-full rounded-md border border-gray-300 bg-gray-200"
             disabled={isButtonDisabled}
-            onClick={nextStep}
           >
-            Send link
+            {formik.isSubmitting ? "Sending..." : "Send OTP"}
           </Button>
           <div className="flex">
             <p>Don't have an account?</p>

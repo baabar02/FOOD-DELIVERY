@@ -87,7 +87,7 @@ export const LogIn = ({
           <div className="flex justify-between">
             <Button
               variant="link"
-              onClick={() => router.push("/Reset")}
+              onClick={() => router.push("/ForgotPassword")}
               className="text-blue-600 underline"
             >
               Forgot password?
