@@ -64,22 +64,19 @@ const validationSchema = Yup.object({
 
 const SignUpPage = () => {
   const router = useRouter();
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(0);
 
-useEffect(()=>{
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+      return;
+    }
+  }, []);
 
-  if(user) {
-    router.push("/")
-    return;
+  if (user) {
+    return null;
   }
-  
-
-},[]);
-
-if(user) {
-  return null;
-}
 
   const Components = [Left, Password];
   const Stepper = Components[currentStep];

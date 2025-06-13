@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Right from "../SignUp/_components/Rigth";
+import Right from "../../SignUp/_components/Rigth";
 import { ChevronLeft } from "lucide-react";
 import { useFormik } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,19 +10,23 @@ import * as Yup from "yup";
 import axios from "axios";
 import { useState } from "react";
 
+type FormValues = {
+  email: string;
+  password: string;
+};
+
 const validationSchema = Yup.object({
   otp: Yup.string()
     .required("OTP is required")
     .matches(/^\d{6}$/, "OTP must be a 6-digit number"),
 });
 
-const VerifyPage = () => {
+export const VerifyPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const email = searchParams.get("email");
-
 
   const formik = useFormik({
     initialValues: {
@@ -34,34 +38,31 @@ const VerifyPage = () => {
         setError("Email is missing. Please start the reset process again.");
         return;
       }
-      
+
       try {
         await axios.post("http://localhost:8000/sendOtp", {
           email,
-          otp:values.otp
+          otp: values.otp,
         });
-       setSuccess("OTP verified!");
+        setSuccess("OTP verified!");
         setTimeout(() => router.push(`/NewPassword?email=${email}`), 2000);
-
       } catch (err: any) {
-      
-          setError(err.response?.data?.message || "An error occurred. Please try again.");
+        setError(
+          err.response?.data?.message || "An error occurred. Please try again."
+        );
         // alert(errorMessage);
       }
     },
   });
 
-
-  const handleResend = async () =>{
-    try{
- await axios.post("http://localhost:8000/sendOtp", {email})
-    setSuccess("Verification OTP resent to your email.")
-    } catch (err:any) {
+  const handleResend = async () => {
+    try {
+      await axios.post("http://localhost:8000/sendOtp", { email });
+      setSuccess("Verification OTP resent to your email.");
+    } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred.");
     }
-   
-  }
-   
+  };
 
   const isButtonDisabled = !!formik.errors.otp || !formik.values.otp.trim();
 
@@ -84,7 +85,7 @@ const VerifyPage = () => {
         <div>
           <p className="text-2xl">Please verify your email</p>
           <p>
-           We sent a 6-digit OTP to <strong>{email || "your email"}</strong>.
+            We sent a 6-digit OTP to <strong>{email || "your email"}</strong>.
             <br />
             Enter the OTP below to verify.
           </p>
@@ -124,5 +125,3 @@ const VerifyPage = () => {
     </div>
   );
 };
-
-export default VerifyPage;

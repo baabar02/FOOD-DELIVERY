@@ -8,7 +8,7 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft } from "lucide-react";
-import Right from "../LogIn/_components/Right";
+import Right from "../../LogIn/_components/Right";
 
 interface FormValues {
   email: string;
@@ -17,6 +17,10 @@ interface FormValues {
   confirmPassword?: string;
 }
 
+type ResetPageProps = {
+  nextStep?: () => void;
+  prevStep?: () => void;
+};
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -24,11 +28,10 @@ const validationSchema = Yup.object({
     .email("Please enter a valid email address"),
 });
 
-const ResetPage = () => {
+export const ResetPage = ({ prevStep, nextStep }: ResetPageProps) => {
   const router = useRouter();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -37,19 +40,16 @@ const ResetPage = () => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        const response = await axios.post(
-          "http://localhost:8000/sendOtp",
-          {
-            email: values.email,
-          }
-        );
+        const response = await axios.post("http://localhost:8000/sendOtp", {
+          email: values.email,
+        });
         setSuccess("OTP sent to your email. Redirecting to verify...");
-        setTimeout(() => router.push(`/Verify?email=${values.email}`), 2000);
 
         // alert("Reset link sent to your email.");
       } catch (err: any) {
-      
-         setError(err.response?.data?.message || "An error occurred. Please try again.");
+        setError(
+          err.response?.data?.message || "An error occurred. Please try again."
+        );
         // alert(errorMessage);
       }
     },
@@ -94,10 +94,10 @@ const ResetPage = () => {
             <div className="text-red-500 text-sm">{formik.errors.email}</div>
           )}
           <Button
-            
             type="submit"
             className="w-full rounded-md border border-gray-300 bg-gray-200"
             disabled={isButtonDisabled}
+            onClick={nextStep}
           >
             Send link
           </Button>
@@ -113,12 +113,10 @@ const ResetPage = () => {
           </div>
         </div>
       </form>
-<Right/>
+      <Right />
     </div>
   );
 };
-
-export default ResetPage;
 
 {
   /* <div className="flex gap-10">
