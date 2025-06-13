@@ -5,8 +5,6 @@ import bcrypt from "bcrypt";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
-import { string } from "yup";
-
 
 const app = express();
 app.use(express.json());
@@ -24,33 +22,59 @@ const databaseConnect = async () => {
   }
 };
 
-
+type UserType = {
+  email: string;
+  password: string;
+  id: string;
+  otp: string;
+  otpExpires: Date;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 const Users = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   firstName: { type: String, required: false },
-  otp: {type: String },
-  otpExpires: { type: Date},
+  id: { type: String },
+  otp: { type: String },
+  otpExpires: { type: Date },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
 
-const UserModel = model("Users", Users);
+type OtpType = {
+  _id: Schema.Types.ObjectId;
+  userId: Schema.Types.ObjectId;
+  code: string;
+  createdAt: Date;
+};
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: "baabarmx@gmail.com",
-      pass: "yignruoqpvxgluyq",
-    },
-  });
+type OtpPopulated = {
+  userId: UserType;
+};
+
+const Otp = new Schema({
+  code: { type: String, required: true },
+  userId: { type: Schema.ObjectId, required: true, ref: "Users" },
+  createdAt: { type: Date, default: Date.now, expires: 120 },
+});
+
+const UserModel = model<UserType>("Users", Users);
+const OtpModel = model<OtpType>("Otp", Otp);
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "baabarmx@gmail.com",
+    pass: "yignruoqpvxgluyq",
+  },
+});
 
 databaseConnect();
-
 
 app.get("/", async (request: Request, response: Response) => {
   response.send("Hello world");
@@ -131,9 +155,9 @@ app.post("/verify", async (request: Request, response: Response) => {
   }
 });
 
-
-
-app.post("/resend-verification", async (request: Request, response: Response) => {
+app.post(
+  "/resend-verification",
+  async (request: Request, response: Response) => {
     const { email } = request.body;
     if (!email) {
       response.status(400).send({ message: "Email is required" });
@@ -148,7 +172,112 @@ app.post("/resend-verification", async (request: Request, response: Response) =>
   }
 );
 
+app.post("/sendOtp", async (request: Request, response: Response) => {
+  const { email } = request.body;
 
+  const isExistingUser = await UserModel.findOne({ email });
+
+  if (!isExistingUser) {
+    response.status(401).send({ message: "User does not exist" });
+    return;
+  }
+
+  const code = 1234;
+
+  if (!email) {
+    response.status(400).send({ message: "Email is required" });
+    return;
+  }
+
+  const user = await UserModel.findOne({ email });
+
+  if (!user) {
+    response.send("User does not exist");
+    return;
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 90000).toString();
+  const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
+  user.otp = otp;
+  user.otpExpires = otpExpires;
+  await user.save();
+
+  const options = {
+    from: "baabarmx@gmail.com",
+    to: "baabar_mx@yahoo.com",
+    subject: "Your OTP code",
+    html: `your OTP code is, ${code}, "It expires 10 minutes"`,
+  };
+  await OtpModel.create({ code: code, userId: isExistingUser._id });
+
+  await transporter.sendMail(options);
+  response.send("OTP sent to email");
+});
+
+app.post("/checkOtp", async (request: Request, response: Response) => {
+  const { email, otp, code } = request.body;
+
+  try {
+    const isOtpExisting = await OtpModel.findOne({
+      code: code,
+    }).populate<OtpPopulated>("userId");
+
+    // const user1 = await UserModel.findById({ _id: isOtpExisting?.userId });
+    // const responseObject = { ...isOtpExisting, ...user1 };
+
+    if (!isOtpExisting) {
+      response.status(400).send("Wrong code");
+      return;
+    }
+    if (email === isOtpExisting?.userId?.email) {
+      response.status(200).send({ message: "Success", isOtpExisting });
+      return;
+    }
+
+    if (!email || !otp) {
+      response.send({ message: "Email and OTP are required" });
+      return;
+    }
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      response.send({ message: "Invalid or expired OTP" });
+      return;
+    }
+    // user.otp = undefined;
+    // user.otpExpires = undefined;
+
+    await user.save();
+    response.send({ message: "OTP verified successfully" });
+  } catch (err) {
+    response.status(400).send("Error");
+  }
+});
+
+// app.put("/updatePassword", async)
+
+app.post("/reset-password", async (request: Request, response: Response) => {
+  const { email, newPassword } = request.body;
+
+  if (!email || !newPassword) {
+    response
+      .status(400)
+      .send({ message: "Email and new password are required" });
+    return;
+  }
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    response.status(404).send({ message: "User does not exist" });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+
+  await user.save();
+  response.send("New password successfully created");
+});
 
 app.delete("/delete", async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -156,9 +285,8 @@ app.delete("/delete", async (req: Request, res: Response) => {
   res.send("Amjilttai");
 });
 
-
-
 app.post("/email", async (request: Request, response: Response) => {
+  const { email } = request.body;
   const transport = nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
@@ -178,89 +306,8 @@ app.post("/email", async (request: Request, response: Response) => {
   };
 
   await transport.sendMail(options);
-
 });
-
-  app.post("/sendOtp", async (request: Request, response: Response) => {
-    const {email} = request.body;
-    if(!email) {
-      response.status(400).send({message:"Email is required"})
-      return;
-    }
-
-    const user = await UserModel.findOne({email});
-
-    if(!user) {
-      response.send("User does not exist")
-      return; 
-    } 
-
-    const otp = Math.floor(100000 + Math.random() * 90000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
-    
-    user.otp = otp;
-    user.otpExpires = otpExpires;
-    await user.save();
-
-  const options = {
-    from: "baabarmx@gmail.com",
-    to: "baabar_mx@yahoo.com",
-    subject: "Your OTP code",
-    text:`your OTP code is, ${otp}, "It expires 10 minutes"`
-    }
-
-  await transporter.sendMail(options)
-    response.send("OTP sent to email")
-  });
-
-  app.post("checkOtp", async (request: Request, response: Response) => {
-    const {email, otp} = request.body;
-    if(!email || !otp) {
-      response.send({message:"Email and OTP are required"})
-      return;
-    }
-    const user = await UserModel.findOne({email});
-    if(!user) {
-      response.send({message:"Invalid or expired OTP"});
-      return;
-    }
-    user.otp = undefined;
-    user.otpExpires = undefined;
-
-    await user.save();
-    response.send({message: "OTP verified successfully"})
-    
-  });
-
-  app.post("/reset-password", async (request: Request, response: Response) => {
-  const { email, newPassword } = request.body;
-
-  if (!email || !newPassword) {
-    response.status(400).send({ message: "Email and new password are required" });
-    return;
-  }
-  const user = await UserModel.findOne({ email });
-  if (!user) {
-    response.status(404).send({ message: "User does not exist" });
-    return;
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-  user.password = hashedPassword;
-
-  await user.save();
-
-});
-
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
-
-
-
-
-
-
-
