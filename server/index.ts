@@ -9,6 +9,8 @@ import nodemailer from "nodemailer";
 const app = express();
 app.use(express.json());
 app.use(cors());
+// require("dotenv").config();
+
 
 const databaseConnect = async () => {
   try {
@@ -25,9 +27,9 @@ const databaseConnect = async () => {
 type UserType = {
   email: string;
   password: string;
-  id: string;
-  otp: string;
-  otpExpires: Date;
+  id?: string;
+  otp?: string | null;
+  otpExpires: Date | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -47,21 +49,26 @@ type OtpType = {
   _id: Schema.Types.ObjectId;
   userId: Schema.Types.ObjectId;
   code: string;
+
   createdAt: Date;
 };
 
 type OtpPopulated = {
   userId: UserType;
+ code:string;
+  createdAt: Date;
 };
 
 const Otp = new Schema({
   code: { type: String, required: true },
   userId: { type: Schema.ObjectId, required: true, ref: "Users" },
-  createdAt: { type: Date, default: Date.now, expires: 120 },
+  createdAt: { type: Date, default: Date.now, expires: 900 },
 });
 
 const UserModel = model<UserType>("Users", Users);
 const OtpModel = model<OtpType>("Otp", Otp);
+
+
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -182,7 +189,6 @@ app.post("/sendOtp", async (request: Request, response: Response) => {
     return;
   }
 
-  const code = 1234;
 
   if (!email) {
     response.status(400).send({ message: "Email is required" });
@@ -207,48 +213,50 @@ app.post("/sendOtp", async (request: Request, response: Response) => {
     from: "baabarmx@gmail.com",
     to: "baabar_mx@yahoo.com",
     subject: "Your OTP code",
-    html: `your OTP code is, ${code}, "It expires 10 minutes"`,
+    html: `your OTP code is, ${otp}, "It expires 10 minutes"`,
   };
-  await OtpModel.create({ code: code, userId: isExistingUser._id });
+  await OtpModel.create({ code: otp, userId: isExistingUser._id });
 
   await transporter.sendMail(options);
   response.send("OTP sent to email");
+  return;
 });
 
+
+
 app.post("/checkOtp", async (request: Request, response: Response) => {
-  const { email, otp, code } = request.body;
+  const { email, otp } = request.body;
+
+  if(!email || !otp) {
+    response.status(400).send({message: "Email and OTP are required"})
+    return;
+  }
 
   try {
-    const isOtpExisting = await OtpModel.findOne({
-      code: code,
-    }).populate<OtpPopulated>("userId");
+    const isOtpExisting = await OtpModel.findOne({code: otp,}).populate<OtpPopulated>("userId");
 
-    // const user1 = await UserModel.findById({ _id: isOtpExisting?.userId });
-    // const responseObject = { ...isOtpExisting, ...user1 };
+if(!isOtpExisting) {
+  response.status(400).send({message:"Invalid or expired OTP"});
+  return;
+}
 
-    if (!isOtpExisting) {
-      response.status(400).send("Wrong code");
-      return;
-    }
-    if (email === isOtpExisting?.userId?.email) {
+    if (email === isOtpExisting || isOtpExisting?.userId?.email) {
       response.status(200).send({ message: "Success", isOtpExisting });
       return;
-    }
-
-    if (!email || !otp) {
-      response.send({ message: "Email and OTP are required" });
-      return;
-    }
-    const user = await UserModel.findOne({ email });
+    } 
+  
+    const user = await UserModel.findOne({ email  });
     if (!user) {
       response.send({ message: "Invalid or expired OTP" });
       return;
     }
-    // user.otp = undefined;
-    // user.otpExpires = undefined;
+    user.otp = null;
+    user.otpExpires = null;
 
     await user.save();
-    response.send({ message: "OTP verified successfully" });
+
+    response.status(200).send({ message: "OTP verified successfully" });
+    return;
   } catch (err) {
     response.status(400).send("Error");
   }
