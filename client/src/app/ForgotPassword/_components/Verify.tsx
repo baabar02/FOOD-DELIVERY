@@ -41,7 +41,7 @@ export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
           otp: values.otp,
         });
         setSuccess("OTP verified! Redirecting...");
-        setTimeout(() => nextStep(), 2000); // Advance to NewPassword
+        setTimeout(() => nextStep(), 2000); 
       } catch (err: any) {
         setError(err.response?.data?.message || "An error occurred. Please try again.");
       }
@@ -74,7 +74,7 @@ export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
             variant="outline"
             className="bg-transparent"
             type="button"
-            onClick={prevStep} // Go back to ResetPage
+            onClick={prevStep} 
           >
             <ChevronLeft size={16} />
           </Button>

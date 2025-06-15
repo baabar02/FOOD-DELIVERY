@@ -1,3 +1,12 @@
-export const NavPage = () => {
-  return <div className="w-full h-[172px] border border-green-400"></div>;
+import { Footer } from "./_components/Footer";
+import { Header } from "./_components/Header";
+
+ const NavPage = () => {
+  return <div>
+    <Header/>
+    ads
+    <Footer/>
+  </div>;
 };
+
+export default NavPage;

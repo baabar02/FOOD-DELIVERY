@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "./UserProvider";
 import { Button } from "@/components/ui/button";
-import { NavPage } from "./Nav/page";
+import  NavPage  from "./Nav/page";
 
 const Home = () => {
   const { user, setUser } = useAuth();
@@ -11,7 +11,7 @@ const Home = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUser(null); // hereglegchiig page ees gargaj baigaa command n ene
+    setUser(null); 
     router.push("/LogIn");
   };
 

@@ -11,7 +11,7 @@ const ForgotPassword = () => {
   const router = useRouter();
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [email, setEmail] = useState<string>(""); // Manage email state
+  const [email, setEmail] = useState<string>(""); 
 
   const Components = [
     () => <ResetPage nextStep={() => setCurrentStep(1)} setEmail={setEmail} />,

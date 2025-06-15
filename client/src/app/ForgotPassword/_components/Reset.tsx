@@ -33,8 +33,9 @@ export const ResetPage = ({ nextStep, setEmail }: ResetPageProps) => {
       try {
         await axios.post("http://localhost:8000/sendOtp", { email: values.email });
         setSuccess("OTP sent to your email.");
-        setEmail(values.email); // Store email for next steps
-        setTimeout(() => nextStep(), 2000); // Advance to VerifyPage
+        setEmail(values.email); 
+        setTimeout(() => nextStep(), 2000); 
+        
       } catch (err: any) {
         setError(err.response?.data?.message || "An error occurred. Please try again.");
       }
