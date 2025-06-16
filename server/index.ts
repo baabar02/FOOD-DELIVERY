@@ -57,11 +57,13 @@ type User = {
   updatedAt: Date;
 };
 
-const FoodOrderItemSchema = new Schema({
-  food: { type: Schema.ObjectId, ref: "Food", required: true },
-  // FoodOrder:{type:{type:[FoodOrderSchema]}, required:true, ref:"FoodOrder"},
-  quantity: { type: Number, required: true },
-});
+const FoodOrderItemSchema = new Schema(
+  {
+    food: { type: Schema.ObjectId, ref: "Food", required: true },
+    quantity: { type: Number, required: true },
+  },
+  { _id: false }
+);
 
 const FoodOrderSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -78,7 +80,6 @@ const FoodOrderSchema = new Schema({
 
 const FoodSchema = new Schema({
   foodName: { type: String, required: true },
-  FoodOrder: { type: [FoodOrderSchema], required: true, ref: "FoodOrder" }, // ?
   price: { type: Number, required: true },
   image: { type: String, required: true },
   ingredients: { type: String, required: true },
@@ -91,10 +92,10 @@ const FoodSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-type UserRoleEnum = {
-  user: User;
-  admin: ADMIN;
-};
+enum UserRoleEnum {
+  user = "USER",
+  admin = "ADMIN",
+}
 
 type FoodOrder = {
   user: ObjectId;
@@ -104,22 +105,6 @@ type FoodOrder = {
   createdAt: Date;
   updatedAt: Date;
 };
-
-type FoodOrderStatusEnum = {
-  pending: "PENDING";
-  canceled: "CANCELED";
-  delivered: "DELIVERED";
-};
-
-const FoodOrderStatusEnum = new Schema({
-  pending: {
-    type: { type: [FoodOrderSchema] },
-    required: true,
-    ref: "FoodOrder",
-  },
-  canceled: {},
-  delivered: {},
-});
 
 type FoodCategory = {
   categoryName: string;
@@ -132,10 +117,6 @@ const FoodCategorySchema = new Schema({
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
-const UserRoleEnumSchema = {
-  USER: "USER",
-  ADMIN: "ADMIN",
-};
 
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true },
@@ -145,7 +126,7 @@ const UserSchema = new Schema({
   role: {
     type: String,
     enum: Object.values(UserRoleEnum),
-    default: UserRoleEnum.USER,
+    default: UserRoleEnum.user,
   },
   orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
   ttl: { type: Date },
