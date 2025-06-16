@@ -34,7 +34,7 @@ enum StatusEnum {
   PENDING = "PENDING",
 }
 
-type food = {
+type Food = {
   foodName: string;
   price: Number;
   image: string;
@@ -44,18 +44,7 @@ type food = {
   updatedAt: Date;
 };
 
-type User = {
-  email: string;
-  password: string;
-  phoneNumber: string;
-  address: string;
-  role: UserRoleEnum;
-  orderedFoods: ObjectId;
-  ttl: Date;
-  isVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-};
+
 
 const FoodOrderItemSchema = new Schema(
   {
@@ -93,8 +82,8 @@ const FoodSchema = new Schema({
 });
 
 enum UserRoleEnum {
-  user = "USER",
-  admin = "ADMIN",
+  USER = "USER",
+  ADMIN = "ADMIN",
 }
 
 type FoodOrder = {
@@ -126,32 +115,48 @@ const UserSchema = new Schema({
   role: {
     type: String,
     enum: Object.values(UserRoleEnum),
-    default: UserRoleEnum.user,
+    default: UserRoleEnum.USER,
   },
   orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
   ttl: { type: Date },
+  otp:{type:String, },
+  otpExpire:{type:Date},
   isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
 
 type UserType = {
+  user:ObjectId;
   email: string;
   password: string;
+  phoneNumber: string;
+  address: string;
+  role: UserRoleEnum;
+  orderedFoods: ObjectId[];
   id?: string;
   otp?: string | null;
   otpExpires: Date | null;
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
 
-const Users = new Schema({
+const UsersSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
-  firstName: { type: String, required: false },
+  phoneNumber: { type: String, required: true },
+address: { type: String, required: true },
+role:{
+    type: String,
+    enum: Object.values(UserRoleEnum),
+    default: UserRoleEnum.USER,
+},
   id: { type: String },
+  orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
   otp: { type: String },
   otpExpires: { type: Date },
+  isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -176,10 +181,20 @@ const Otp = new Schema({
   createdAt: { type: Date, default: Date.now, expires: 900 },
 });
 
-const UserModel = model<UserType>("Users", Users);
+const UserModel = model<UserType>("Users", UserSchema);
 const OtpModel = model<OtpType>("Otp", Otp);
 
+const FoodModel = model<Food>("Food", FoodSchema);
+const FoodCategoryModel = model<FoodCategory>("Food-Category", FoodCategorySchema);
+const FoodOrderModel = model<FoodOrderItem>("Food-Order", FoodOrderSchema)
+
+
+
 const transporter = nodemailer.createTransport({
+
+
+
+
   service: "gmail",
   host: "smtp.gmail.com",
   port: 465,
@@ -191,6 +206,84 @@ const transporter = nodemailer.createTransport({
 });
 
 databaseConnect();
+
+app.get("/food-categories", async(request:Request, response:Response)=>{
+
+  const categories = await FoodCategoryModel.find();
+  console.log(categories,"asd");
+  const populatedCategories = await Promise.all(
+    categories.map( async(category)=>{
+      const foods = await FoodModel.find({category: category._id})
+      return {...category, foods}
+    })
+  );
+  
+  response.status(200).send({message:"food categories returned successfully", data:populatedCategories});
+
+})
+
+app.post("/food-categories", async(request:Request, response:Response)=>{
+
+  const {categoryName} = request.body
+  if(!categoryName){
+    response.status(400).send({message:"Category name is required"});
+    return;
+  }
+  const existingCategory = await FoodCategoryModel.findOne({ categoryName });
+    if (existingCategory) {
+     response.status(400).send({ message: "Category already exists" });
+    }
+    try{
+ const newCategory = await FoodCategoryModel.create({categoryName});
+    response.status(201).send({
+      message: "Category created successfully",
+      data: newCategory,
+    });
+    } catch (error) {
+      console.error("Error creating food category:", error);
+    response.status(500).json({ message: "Server error" });
+    }
+   
+})
+
+app.get("/food-order", async(request:Request, response:Response)=>{
+  const {userId} = request.body;
+  if(!userId) {
+    response.status(401).send({message:"User authentication required"})
+  }
+
+  const orders = await FoodOrderModel.find({userId}).populate("user", "email phoneNumber address").populate("foodOrderItems.food", "foodName price image")
+  response.status(200).send({
+      message: "Food orders retrieved successfully",
+      data: orders,
+    });
+})
+ 
+app.post("/food-order", async(request:Request, response:Response)=>{
+  const {user, totalPrice, quantity} = request.body;
+  // const userId = request.user?.userId;
+  // if(!userId){
+  // response.status(401).send("User authentication required");
+  // return;
+  // }
+
+  const {food: foodId, } = request.body;
+
+  
+if(!foodId || !quantity ) {
+response.status(401).send("Invalid food or quantity")
+return;
+}
+const food = await FoodModel.findById({foodId});
+
+const newOrder = await FoodOrderModel.create({user, totalPrice, status:StatusEnum.PENDING});
+const populatedOrder = await FoodOrderModel.findById({newOrder}).populate("user", "email phoneNumber address")
+response.status(201).json({
+      message: "Food order created successfully",
+      data: populatedOrder,
+    });
+})
+
 
 app.get("/", async (request: Request, response: Response) => {
   response.send("Hello world");
