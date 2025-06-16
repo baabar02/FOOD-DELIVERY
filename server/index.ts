@@ -1,5 +1,5 @@
 import express, { request, Request, Response } from "express";
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import cors from "cors";
@@ -10,7 +10,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 // require("dotenv").config();
-
 
 const databaseConnect = async () => {
   try {
@@ -23,6 +22,137 @@ const databaseConnect = async () => {
     console.log(err, "Database connection error");
   }
 };
+
+type FoodOrderItem = {
+  food: ObjectId;
+  quantity: Number;
+};
+
+enum StatusEnum {
+  CANCELED = "CANCELED",
+  DELIVERED = "DELIVERED",
+  PENDING = "PENDING",
+}
+
+type food = {
+  foodName: string;
+  price: Number;
+  image: string;
+  ingredients: string;
+  category: ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type User = {
+  email: string;
+  password: string;
+  phoneNumber: string;
+  address: string;
+  role: UserRoleEnum;
+  orderedFoods: ObjectId;
+  ttl: Date;
+  isVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+const FoodOrderItemSchema = new Schema({
+  food: { type: Schema.ObjectId, ref: "Food", required: true },
+  // FoodOrder:{type:{type:[FoodOrderSchema]}, required:true, ref:"FoodOrder"},
+  quantity: { type: Number, required: true },
+});
+
+const FoodOrderSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  foodOrderItems: { type: [FoodOrderItemSchema], required: true },
+  totalPrice: { type: Number, required: true },
+  status: {
+    type: String,
+    enum: Object.values(StatusEnum),
+    default: StatusEnum.PENDING,
+  },
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+const FoodSchema = new Schema({
+  foodName: { type: String, required: true },
+  FoodOrder: { type: [FoodOrderSchema], required: true, ref: "FoodOrder" }, // ?
+  price: { type: Number, required: true },
+  image: { type: String, required: true },
+  ingredients: { type: String, required: true },
+  category: {
+    type: Schema.Types.ObjectId,
+    ref: "FoodCategory",
+    required: true,
+  },
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+type UserRoleEnum = {
+  user: User;
+  admin: ADMIN;
+};
+
+type FoodOrder = {
+  user: ObjectId;
+  totalPrice: Number;
+  foodOrderItems: FoodOrderItem[];
+  status: StatusEnum;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type FoodOrderStatusEnum = {
+  pending: "PENDING";
+  canceled: "CANCELED";
+  delivered: "DELIVERED";
+};
+
+const FoodOrderStatusEnum = new Schema({
+  pending: {
+    type: { type: [FoodOrderSchema] },
+    required: true,
+    ref: "FoodOrder",
+  },
+  canceled: {},
+  delivered: {},
+});
+
+type FoodCategory = {
+  categoryName: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+const FoodCategorySchema = new Schema({
+  categoryName: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  updatedAt: { type: Date, default: Date.now },
+});
+const UserRoleEnumSchema = {
+  USER: "USER",
+  ADMIN: "ADMIN",
+};
+
+const UserSchema = new Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  phoneNumber: { type: String, required: true },
+  address: { type: String, required: true },
+  role: {
+    type: String,
+    enum: Object.values(UserRoleEnum),
+    default: UserRoleEnum.USER,
+  },
+  orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
+  ttl: { type: Date },
+  isVerified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now, immutable: true },
+  updatedAt: { type: Date, default: Date.now },
+});
 
 type UserType = {
   email: string;
@@ -55,7 +185,7 @@ type OtpType = {
 
 type OtpPopulated = {
   userId: UserType;
- code:string;
+  code: string;
   createdAt: Date;
 };
 
@@ -67,8 +197,6 @@ const Otp = new Schema({
 
 const UserModel = model<UserType>("Users", Users);
 const OtpModel = model<OtpType>("Otp", Otp);
-
-
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -189,7 +317,6 @@ app.post("/sendOtp", async (request: Request, response: Response) => {
     return;
   }
 
-
   if (!email) {
     response.status(400).send({ message: "Email is required" });
     return;
@@ -222,30 +349,30 @@ app.post("/sendOtp", async (request: Request, response: Response) => {
   return;
 });
 
-
-
 app.post("/checkOtp", async (request: Request, response: Response) => {
   const { email, otp } = request.body;
 
-  if(!email || !otp) {
-    response.status(400).send({message: "Email and OTP are required"})
+  if (!email || !otp) {
+    response.status(400).send({ message: "Email and OTP are required" });
     return;
   }
 
   try {
-    const isOtpExisting = await OtpModel.findOne({code: otp,}).populate<OtpPopulated>("userId");
+    const isOtpExisting = await OtpModel.findOne({
+      code: otp,
+    }).populate<OtpPopulated>("userId");
 
-if(!isOtpExisting) {
-  response.status(400).send({message:"Invalid or expired OTP"});
-  return;
-}
+    if (!isOtpExisting) {
+      response.status(400).send({ message: "Invalid or expired OTP" });
+      return;
+    }
 
     if (email === isOtpExisting || isOtpExisting?.userId?.email) {
       response.status(200).send({ message: "Success", isOtpExisting });
       return;
-    } 
-  
-    const user = await UserModel.findOne({ email  });
+    }
+
+    const user = await UserModel.findOne({ email });
     if (!user) {
       response.send({ message: "Invalid or expired OTP" });
       return;
