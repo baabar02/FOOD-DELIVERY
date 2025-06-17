@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 import cors from "cors";
 import { Schema } from "mongoose";
 
@@ -8,13 +8,13 @@ enum UserRoleEnum {
 }
 
 export type UserType = {
-  user: ObjectId;
+  _id:String;
+  // user: ObjectId;
   email: string;
   password: string;
   phoneNumber?: string;
   address?: string;
   role: UserRoleEnum;
-  orderedFoods: ObjectId[];
   id?: string;
   otp?: string | null;
   otpExpires: Date | null;
@@ -28,10 +28,10 @@ export const UserSchema = new Schema<UserType>({
   password: { type: String, required: true },
   phoneNumber: { type: String, required: false },
   address: { type: String, required: false },
-  role: { type: String, enum: ["ADMIN" | "USER"], required: false },
+  role: { type: String, enum: ["ADMIN", "USER"], required: false },
 
   id: { type: String },
-  orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
+  // orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
   otp: { type: String },
   otpExpires: { type: Date },
   isVerified: { type: Boolean, default: false },
@@ -39,4 +39,6 @@ export const UserSchema = new Schema<UserType>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const UserModel = model<UserType>("Users", UserSchema);
+UserSchema.index({email: 1}, {unique:true});
+
+export const UserModel = model<UserType>("Users", UserSchema);

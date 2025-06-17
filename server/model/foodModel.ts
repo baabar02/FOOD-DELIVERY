@@ -1,4 +1,4 @@
-import { ObjectId, Schema } from "mongoose";
+import { model, ObjectId, Schema } from "mongoose";
 
 type NewType = {
   foodName: string;
@@ -25,3 +25,7 @@ export const FoodSchema = new Schema({
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
+
+FoodSchema.index({foodName: 1}, {unique:true});
+
+export const FoodModel = model<Food>("Food", FoodSchema);

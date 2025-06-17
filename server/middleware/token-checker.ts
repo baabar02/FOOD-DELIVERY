@@ -3,8 +3,15 @@ import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { UserModel } from "../model/usersModel";
 
-export const Verify = async (request: Request, response: Response, next: NextFunction) => {
-    const { token } = request.body;
+export const TokenCheker = async (request: Request, response: Response, next: NextFunction) => {
+    const authorization = request.headers.authorization;
+
+    if(!authorization){
+       response.status(401).send({ message: "token is not valid" });
+        return;
+    }
+
+    const token = authorization.split('')[1];
 
     const tokenPassword = "foodDelivery";
 
@@ -28,17 +35,5 @@ export const Verify = async (request: Request, response: Response, next: NextFun
     }
   };
 
-// "/resend-verification"
-export const resendVerification = async (request: Request, response: Response) => {
-    const { email } = request.body;
-    if (!email) {
-      response.status(400).send({ message: "Email is required" });
-      return;
-    }
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      response.status(400).send({ message: "User does not exist" });
-      return;
-    }
-    response.send({ message: "Verification email resent" });
-  }
+
+
