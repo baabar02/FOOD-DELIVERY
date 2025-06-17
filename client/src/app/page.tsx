@@ -63,7 +63,7 @@ const Home = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:8000/food-categories");
+        const response = await fetch("http://localhost:8000/categories");
         console.log(response, "aadssad");
 
         const { data } = await response.json();
@@ -83,7 +83,7 @@ const Home = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/food-categories", {
+      const response = await fetch("http://localhost:8000/addCategories", {
         body: JSON.stringify({ categoryName }),
       });
 
