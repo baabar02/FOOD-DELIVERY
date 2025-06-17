@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -7,19 +5,18 @@ import { useAuth } from "./UserProvider";
 import { Button } from "@/components/ui/button";
 import NavPage from "./Nav/page";
 import { useState, ChangeEvent } from "react";
-import  Image  from "next/image";
+import Image from "next/image";
 import { create } from "domain";
 import { useEffect } from "react";
-
 
 const Home = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
-  const[url, setUrl] = useState("");
-  const[categories,setCategories] = useState<any>("")
-const[categoryName,setCategoryName] =useState<string>("")
-const[error,setError]=useState("")
+  const [url, setUrl] = useState("");
+  const [categories, setCategories] = useState<any>("");
+  const [categoryName, setCategoryName] = useState<string>("");
+  const [error, setError] = useState("");
 
   const uploadImage = async () => {
     if (!file) {
@@ -40,7 +37,6 @@ const[error,setError]=useState("")
         }
       );
 
-
       const result = await response.json();
       console.log("Uploaded image URL:", result.secure_url);
       alert("Image uploaded successfully!");
@@ -54,34 +50,33 @@ const[error,setError]=useState("")
 
   const fileHandler = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
- 
 
     if (selectedFile) {
       setFile(selectedFile);
-      
-   const url = URL.createObjectURL(selectedFile)
-  setUrl(url)
-  console.log("Selected file:", selectedFile.name);
+
+      const url = URL.createObjectURL(selectedFile);
+      setUrl(url);
+      console.log("Selected file:", selectedFile.name);
     }
-  
   };
 
-useEffect(() => {
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:8000/food-categories");
-      
+        console.log(response, "aadssad");
+
         const { data } = await response.json();
+
         setCategories(data);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-       
+      } catch (error) {
+        console.error("Error fetching categories:", error);
       }
     };
     fetchCategories();
   }, []);
 
-const createCategory = async () => {
+  const createCategory = async () => {
     if (!categoryName) {
       setError("Category name is required");
       return;
@@ -89,26 +84,16 @@ const createCategory = async () => {
 
     try {
       const response = await fetch("http://localhost:8000/food-categories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ categoryName }),
       });
-
-      if (!response.ok) {
-        const { message } = await response.json();
-        throw new Error(message);
-      }
 
       const { data } = await response.json();
       setCategories([...categories, data]);
       setCategoryName("");
-   
     } catch (err: any) {
       console.error("Error creating category:", err);
-    
     }
   };
-
 
   return (
     <div className="text-2xl">
@@ -124,39 +109,37 @@ const createCategory = async () => {
       >
         Log in
       </Button>
-      <Image src={url} alt="food" width={100} height={100}/>
-      
+      <Image src={url} alt="food" width={100} height={100} />
+
       <div className="mt-4">
         <h2>Create Food Category</h2>
         <input
           type="text"
           value={categoryName}
-          onChange={(e) => setCategoryName(e.target.value)}
+          onChange={(event) => setCategoryName(event.target.value)}
           placeholder="Enter category name (e.g., Pizza)"
           className="border p-2 mr-2"
         />
         <Button onClick={createCategory}>Create Category</Button>
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div>
-
     </div>
   );
 };
 
 export default Home;
 
+// const handleLogout = () => {
+//   localStorage.removeItem("token");
+//   setUser(null);
+//   router.push("/LogIn");
+// };
 
-
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   setUser(null);
-  //   router.push("/LogIn");
-  // };
-
-      {/* <Button
+{
+  /* <Button
         className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
         onClick={handleLogout}
       >
         Log out
-      </Button> */}
+      </Button> */
+}
