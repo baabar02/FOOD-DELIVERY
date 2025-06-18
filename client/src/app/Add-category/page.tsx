@@ -1,26 +1,79 @@
+// "use client";
+// import { useRouter } from "next/navigation";
+// import { Schema } from "mongoose";
+// import { useFormik } from "formik";
+// import axios from "axios";
+// import * as Yup from "yup";
+
+// type FoodValues = {
+//   categoryName: string;
+// };
+
+// const FoodValidationSchema = Yup.object({
+//   categoryName: Yup.string().required("Category name is required"),
+// });
+
+// export type foodProps = {
+//   values: FoodValues;
+//   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+
+//   onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
+// };
+
+// // FoodValidationSchema.index({ categoryName: 1 }, { unique: true });
+
+// const CategoryPage = () => {
+//   const router = useRouter();
+
+//   const formik = useFormik<FoodValues>({
+//     initialValues: {
+//       categoryName: "",
+//     },
+//     validationSchema: FoodValidationSchema,
+
+//     onSubmit: async (values) => {
+//       console.log("asdfghjkl");
+//       try {
+//         const response = await axios.post(
+//           "http://localhost:8000/categories",
+//           {
+//             categoryName: values.categoryName,
+//           }
+//         );
+//         console.log(response.data.message, "axios");
+//         if (response) {
+//           alert("add successful");
+//         }
+//       } catch (err: any) {
+//         const errorMessage =
+//           err.response?.data?.message || "Error occured. try again";
+//         alert(errorMessage);
+//       }
+//     },
+//   });
+//   return <div>jgkh</div>;
+// };
+
+// export default CategoryPage;
+
 "use client";
 import { useRouter } from "next/navigation";
-import { Schema } from "mongoose";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
+
 
 type FoodValues = {
   categoryName: string;
 };
 
+
 const FoodValidationSchema = Yup.object({
-  categoryName: Yup.string().required("Category name is required"),
+  categoryName: Yup.string()
+    .required("Category name is required")
+    .min(2, "Category name must be at least 2 characters")
+    .max(50, "Category name must not exceed 50 characters"),
 });
-
-export type foodProps = {
-  values: FoodValues;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
-};
-
-// FoodValidationSchema.index({ categoryName: 1 }, { unique: true });
 
 const CategoryPage = () => {
   const router = useRouter();
@@ -30,28 +83,61 @@ const CategoryPage = () => {
       categoryName: "",
     },
     validationSchema: FoodValidationSchema,
-
     onSubmit: async (values) => {
-      console.log("asdfghjkl");
       try {
+       
+        const token = localStorage.getItem("token"); 
+
         const response = await axios.post(
-          "http://localhost:8000/addCategories",
+          "http://localhost:8000/categories",
+          { categoryName: values.categoryName },
           {
-            categoryName: values.categoryName,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
-        console.log(response.data.message, "axios");
-        if (response) {
-          alert("add successful");
-        }
+
+        alert(response.data.message);
+        router.push("/categories"); 
       } catch (err: any) {
         const errorMessage =
-          err.response?.data?.message || "Error occured. try again";
+          err.response?.data?.message || "An error occurred. Please try again.";
         alert(errorMessage);
       }
     },
   });
-  return <div>jgkh</div>;
+
+  return (
+    <div className="max-w-md mx-auto mt-10">
+      <h1 className="text-2xl font-bold mb-4">Add New Category</h1>
+      <form onSubmit={formik.handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="categoryName" className="block text-sm font-medium">
+            Category Name
+          </label>
+          <input
+            id="categoryName"
+            name="categoryName"
+            type="text"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.categoryName}
+            className="mt-1 block w-full border rounded-md p-2"
+          />
+          {formik.touched.categoryName && formik.errors.categoryName ? (
+            <div className="text-red-500 text-sm">{formik.errors.categoryName}</div>
+          ) : null}
+        </div>
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+        >
+          Add Category
+        </button>
+      </form>
+    </div>
+  );
 };
 
 export default CategoryPage;
