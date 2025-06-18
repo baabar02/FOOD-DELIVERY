@@ -16,8 +16,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
-
 const databaseConnect = async () => {
   try {
     await mongoose.connect(
@@ -30,6 +28,13 @@ const databaseConnect = async () => {
   }
 };
 
+app.get("/", async (request: Request, response: Response) => {
+  response.send("hi");
+  return;
+});
+
+databaseConnect();
+
 app.use(UserRouter);
 app.use(CategoryRouter);
 app.use(FoodRouter);
@@ -39,5 +44,3 @@ app.use(DeleteRouter);
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
-
-

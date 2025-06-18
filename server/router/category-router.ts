@@ -6,5 +6,5 @@ import { allCategory } from "../controller/category/get-Categories";
 
 export const CategoryRouter = Router();
 
-CategoryRouter.post("/addCategories",TokenCheker, createCategory)
-CategoryRouter.get("/categories", allCategory)
+CategoryRouter.post("/addCategories", TokenCheker, createCategory);
+CategoryRouter.get("/categories", allCategory);

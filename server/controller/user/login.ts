@@ -1,9 +1,7 @@
-
 import { Request, Response } from "express";
-import {UserModel} from "../../model/usersModel";
+import { UserModel } from "../../model/usersModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
 
 export const Login = async (request: Request, response: Response) => {
   try {
@@ -12,17 +10,19 @@ export const Login = async (request: Request, response: Response) => {
 
     const user = await UserModel.findOne({ email });
     if (!user) {
-      response.status(400).send({ message: "User email or password not match" });
+      response
+        .status(400)
+        .send({ message: "User email or password not match" });
       return;
     }
 
-    if (!user.password) {
-      response
-        .status(500)
-        .send({ message: " User password not found in DataBase" });
-    }
+    // if (!user.password) {
+    //   response
+    //     .status(500)
+    //     .send({ message: " User password not found in DataBase" });
+    // }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password!);
+    const isPasswordValid = await bcrypt.compareSync(password, user.password!);
 
     const tokenPassword = "foodDelivery";
 
@@ -32,13 +32,11 @@ export const Login = async (request: Request, response: Response) => {
       response.status(401).send({ message: " Wrong password, try again" });
       return;
     } else {
-      response
-        .status(200)
-        .send({ message: "Successfully logged in ", token, userID: user?._id });
+      response.status(200).send({ message: "Successfully logged in ", token });
       return;
     }
   } catch (error) {
     console.log(error, "Login error");
-    response.status(500).send({ message: "Server error" });
+    response.status(401).send({ message: "Server error ?" });
   }
 };
