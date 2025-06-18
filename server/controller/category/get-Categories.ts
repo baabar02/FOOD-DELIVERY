@@ -8,10 +8,7 @@ export const allCategory = async (request: Request, response: Response) => {
     response.status(400).send({ message: "Category name is required" });
     return;
   }
-  const existingCategory = await FoodCategoryModel.find({ categoryName });
-  if (existingCategory) {
-    response.status(400).send({ message: "Category already exists" });
-  }
+
   try {
     const newCategory = await FoodCategoryModel.create({ categoryName });
     response.status(201).send({

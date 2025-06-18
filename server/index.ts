@@ -1,4 +1,4 @@
-import express, { request, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import mongoose, { ObjectId } from "mongoose";
 import { Schema, model } from "mongoose";
 
@@ -44,3 +44,11 @@ app.use(DeleteRouter);
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
+
+
+// {
+//   "watch": [],
+//   "ext": "ts",
+//   "ignore": ["**/*.spec.ts"],
+//   "exec": "ts-node ./index.ts"
+// }

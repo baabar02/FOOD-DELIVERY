@@ -1,29 +1,30 @@
+
+
 import { Request, Response } from "express";
 import { FoodCategoryModel } from "../../model/categoryModel";
-import { FoodModel } from "../../model/foodModel";
 
 export const createCategory = async (request: Request, response: Response) => {
   try {
-    const { categoryName } = request.body?.categoryName;
-    response.send(categoryName);
-    const categories = await FoodCategoryModel.create({ categoryName });
-    response.send({ message: "Successully created category" });
+    const { categoryName } = request.body;
 
     if (!categoryName) {
-      response.status(401).send({ message: "Category name is required" });
+      return response.status(401).send({ message: "Category name is required" });
     }
-    //   const populatedCategories:any = await FoodCategoryModel.findOne(
-    //     categories.map(async (category: { _id: any; }) => {
-    //       const foods = await FoodModel.find({ category: category._id });
-    //       return foods;
-    //     })
-    //   );
 
-    response.status(200).send({
-      message: "food categories returned successfully",
-      // data: populatedCategories,
+    const existingCategory = await FoodCategoryModel.findOne({ categoryName });
+    if (existingCategory) {
+      return response.status(400).send({ message: "Category already exists" });
+    }
+
+    const newCategory = await FoodCategoryModel.create({ categoryName });
+
+    return response.status(201).send({
+      message: "Successfully created category",
+      data: newCategory,
     });
+
   } catch (err) {
-    response.status(400).send({ message: "server occured error" });
+    console.error(err);
+    return response.status(500).send({ message: "Server error occurred" });
   }
 };

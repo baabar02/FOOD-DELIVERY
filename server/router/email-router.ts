@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { TokenCheker } from "../middleware/token-checker";
+import { TokenChecker,  } from "../middleware/token-checker";
 import { UserRouter } from "./user-router";
 import { createCategory } from "../controller/category/create-category";
 import { allCategory } from "../controller/category/get-Categories";
@@ -10,4 +10,4 @@ import { sendEmail } from "../controller/user/sendEmail";
 
 export const EmailRouter = Router();
 
-EmailRouter.post("/email",TokenCheker, sendEmail)
+EmailRouter.post("/email",TokenChecker, sendEmail)
