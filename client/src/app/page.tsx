@@ -60,40 +60,40 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/categories");
-        console.log(response, "aadssad");
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:8000/categories");
+  //       console.log(response, "aadssad");
 
-        const { data } = await response.json();
+  //       const { data } = await response.json();
 
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
+  //       setCategories(data);
+  //     } catch (error) {
+  //       console.error("Error fetching categories:", error);
+  //     }
+  //   };
+  //   fetchCategories();
+  // }, []);
 
-  const createCategory = async () => {
-    if (!categoryName) {
-      setError("Category name is required");
-      return;
-    }
+  // const createCategory = async () => {
+  //   if (!categoryName) {
+  //     setError("Category name is required");
+  //     return;
+  //   }
 
-    try {
-      const response = await fetch("http://localhost:8000/addCategories", {
-        body: JSON.stringify({ categoryName }),
-      });
+  //   try {
+  //     const response = await fetch("http://localhost:8000/addCategories", {
+  //       body: JSON.stringify({ categoryName }),
+  //     });
 
-      const { data } = await response.json();
-      setCategories([...categories, data]);
-      setCategoryName("");
-    } catch (err: any) {
-      console.error("Error creating category:", err);
-    }
-  };
+  //     const { data } = await response.json();
+  //     setCategories([...categories, data]);
+  //     setCategoryName("");
+  //   } catch (err: any) {
+  //     console.error("Error creating category:", err);
+  //   }
+  // };
 
   return (
     <div className="text-2xl">
@@ -120,7 +120,7 @@ const Home = () => {
           placeholder="Enter category name (e.g., Pizza)"
           className="border p-2 mr-2"
         />
-        <Button onClick={createCategory}>Create Category</Button>
+        {/* <Button onClick={createCategory}>Create Category</Button> */}
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div>
     </div>
