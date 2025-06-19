@@ -21,5 +21,4 @@ export const Otp = new Schema({
   createdAt: { type: Date, default: Date.now, expires: 900 },
 });
 
-
-export const OtpModel = model<OtpType>("Otp", Otp);
+export const OtpModel = model<OtpType>("Otps", Otp);

@@ -22,15 +22,14 @@ type FoodOrderItem = {
 
 const FoodOrderItemSchema = new Schema(
   {
-    food: { type: Schema.ObjectId, ref: "Food", required: true },
+    food: { type: Schema.ObjectId, ref: "Foods", required: true },
     quantity: { type: Number, required: true },
   },
   { _id: false }
 );
 
-
 export const FoodOrderSchema = new Schema({
-  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  user: { type: Schema.Types.ObjectId, ref: "Users", required: true },
   foodOrderItems: { type: [FoodOrderItemSchema], required: true },
   totalPrice: { type: Number, required: true },
   status: {
@@ -42,5 +41,7 @@ export const FoodOrderSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-
-export const FoodOrderModel = model<FoodOrderItem>("Food-Order", FoodOrderSchema);
+export const FoodOrderModel = model<FoodOrderItem>(
+  "Food-Order",
+  FoodOrderSchema
+);

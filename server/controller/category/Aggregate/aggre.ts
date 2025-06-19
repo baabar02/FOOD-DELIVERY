@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { FoodModel } from "../../model/foodModel";
+import { FoodModel } from "../../../model/foodModel";
 
 export const getFoodsGroupedByCategory = async (
   req: Request,
@@ -9,7 +9,7 @@ export const getFoodsGroupedByCategory = async (
     const result = await FoodModel.aggregate([
       {
         $lookup: {
-          from: "foodcategories",
+          from: "categories",
           localField: "category",
           foreignField: "_id",
           as: "categoryInfo",
@@ -43,18 +43,3 @@ export const getFoodsGroupedByCategory = async (
     res.status(500).send({ error: "Server error while fetching foods" });
   }
 };
-
-// const obj: Record<string, number | string> = {};
-// const item = "hehe";
-// const hello = "haha";
-
-// obj[hello] = 123;
-// obj.hello = 123;
-
-// obj[item] = "dagger";
-
-// const arr = [1, 2, 3, 4, 5];
-// const sumOfArray = arr.reduce((accumulator: any, eachElement: any) => {
-//   accumulator += eachElement;
-//   return accumulator;
-// }, 0);

@@ -19,13 +19,13 @@ export const FoodSchema = new Schema({
   ingredients: { type: String, required: true },
   category: {
     type: Schema.Types.ObjectId,
-    ref: "FoodCategory",
+    ref: "FoodCategories",
     required: true,
   },
   createdAt: { type: Date, default: Date.now, immutable: true },
   updatedAt: { type: Date, default: Date.now },
 });
 
-FoodSchema.index({foodName: 1}, {unique:true});
+FoodSchema.index({ foodName: 1 }, { unique: true });
 
-export const FoodModel = model<Food>("Food", FoodSchema);
+export const FoodModel = model<Food>("Foods", FoodSchema);

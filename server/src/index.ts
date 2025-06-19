@@ -1,16 +1,11 @@
 import express, { Request, Response } from "express";
-import mongoose, { ObjectId } from "mongoose";
-import { Schema, model } from "mongoose";
-
+import mongoose from "mongoose";
 import cors from "cors";
-
-import nodemailer from "nodemailer";
-import { UserRouter } from "./router/user-router";
-import { UserModel } from "./model/usersModel";
-import { CategoryRouter } from "./router/category-router";
-import { FoodRouter } from "./router/food-router";
-import { OrderRouter } from "./router/order-router";
-import { DeleteRouter } from "./router/user-delete.router";
+import { UserRouter } from "../router/user-router";
+import { CategoryRouter } from "../router/category-router";
+import { FoodRouter } from "../router/food-router";
+import { OrderRouter } from "../router/order-router";
+import { DeleteRouter } from "../router/user-delete.router";
 
 const app = express();
 app.use(express.json());
@@ -44,11 +39,3 @@ app.use(DeleteRouter);
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
 });
-
-
-// {
-//   "watch": [],
-//   "ext": "ts",
-//   "ignore": ["**/*.spec.ts"],
-//   "exec": "ts-node ./index.ts"
-// }
