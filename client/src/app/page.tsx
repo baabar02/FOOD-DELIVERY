@@ -6,10 +6,22 @@ import { Button } from "@/components/ui/button";
 import NavPage from "./Nav/page";
 import { useState, ChangeEvent } from "react";
 import Image from "next/image";
-import { create } from "domain";
-import { useEffect } from "react";
 
-const Home = () => {
+type FoodProps = {
+  foodName: string;
+  image: string;
+  ingredients: string;
+  price: number;
+  _id: string;
+};
+
+type PropsType = {
+  foods: Record<string, FoodProps[]>;
+};
+
+
+const Home =  () => {
+
   const { user } = useAuth();
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
@@ -60,10 +72,12 @@ const Home = () => {
     }
   };
 
+
+
   return (
     <div className="text-2xl">
       <h1>Welcome {user ? user.userId : "Guest"}!</h1>
-      <NavPage />
+     <NavPage />
 
       <input type="file" onChange={fileHandler} accept="image/*" />
       <Button onClick={uploadImage}>Upload</Button>

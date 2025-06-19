@@ -1,4 +1,4 @@
-import { Copyright } from "lucide-react";
+import { Copyright, Link } from "lucide-react";
 import Image from "next/image";
 
 export const Footer = () => {
@@ -62,7 +62,12 @@ export const Footer = () => {
             </div>
             <div className="flex flex-col gap-4">
               <h1 className="text-[#71717A] text-[16px]">MENU</h1>
+              <Link 
+                className="text-[#FAFAFA] text-[16px] hover:text-[#EF4444] transition-colors"
+                href="/Appetizer">
               <h2 className="text-[#FAFAFA] text-[16px]">Appatizer</h2>
+              </Link>
+              
               <h2 className="text-[#FAFAFA] text-[16px]">Salads</h2>
               <h2 className="text-[#FAFAFA] text-[16px]">Pizzas</h2>
               <h2 className="text-[#FAFAFA] text-[16px]">Main dishes</h2>
@@ -122,3 +127,4 @@ export const Footer = () => {
     </div>
   );
 };
+
