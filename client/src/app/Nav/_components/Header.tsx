@@ -1,3 +1,5 @@
+
+
 "use client";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -15,8 +17,26 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useState } from "react";
+import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
 
-export const Header = () => {
+
+type FoodProps = {
+  foodName: string;
+  image: string;
+  ingredients: string;
+  price: number;
+  _id: string;
+  onAddToCart?: (food: FoodProps & {quantity:number}) => void;
+};
+
+
+type PropsType = {
+  foods: Record<string, FoodProps[]>;
+ 
+};
+
+
+export const Header = ({foods}:PropsType) => {
   const path = usePathname();
   const arr = ["/login", "/signup"];
 
@@ -99,7 +119,8 @@ export const Header = () => {
         </Dialog>
 
         <div className="bg-amber-50 w-[36px] h-[36px] flex items-center justify-center rounded-full">
-          <ShoppingCart className="w-[16px] h-[16px]" />
+       
+          <OrderDetail />
         </div>
         <div className="bg-[#EF4444] w-[36px] h-[36px] flex items-center justify-center rounded-full text-amber-50">
           <Button

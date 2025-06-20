@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
-import { Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
+import { useState } from "react";
 
 type FoodProps = {
   foodName: string;
@@ -7,11 +9,16 @@ type FoodProps = {
   ingredients: string;
   price: number;
   _id: string;
+  onAddToCart?: (food: FoodProps & {quantity:number}) => void;
 };
+
 
 type PropsType = {
   foods: Record<string, FoodProps[]>;
+ 
 };
+
+
 
 export const FoodDialog = ({
   foodName,
@@ -19,47 +26,85 @@ export const FoodDialog = ({
   ingredients,
   price,
   _id,
-}: FoodProps) => {
-  return (
-    <div>
-      <Dialog>
-        <DialogTrigger>
-          <Plus />
-        </DialogTrigger>
-        <DialogContent className="flex border bg-amber-50 border-green-400 !w-[500px] !max-w-[800px] !h-[500px]">
-          <div
-            key={_id}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow w-full max-w-[398px] mx-auto"
-          >
-            <div className="relative mt-2 mx-2">
-              <img
-                src={image}
-                alt={foodName}
-                className="w-full h-48 object-cover rounded-lg"
-                loading="lazy"
-              />
+onAddToCart
 
-              <div
-                // onClick={() => handleAddToCart(food)}
-                className="absolute top-35 right-3 h-10 w-10 bg-amber-50 text-red-500 rounded-full hover:bg-amber-100 flex items-center justify-center text-lg"
+}: FoodProps) => {
+
+  const [quantity, setQuantity] =useState<number>(1)
+
+const addButton = () =>{
+setQuantity((prev)=> prev + 1);
+}
+
+const decButton = () =>{
+  setQuantity((prev)=> (prev > 1 ? prev - 1 : 1))
+}
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+      
+          <Plus />
+       
+      </DialogTrigger>
+     <DialogContent
+  className="fixed z-50 flex items-center justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+>
+  <div className=" bg-white rounded-lg shadow-xl max-w-[826px] w-full h-[412px] p-6">
+    <div className="flex flex-col sm:flex-row items-center sm:items-start">
+      <img
+        src={image}
+        alt={foodName}
+        className="w-[377px]  h-[364px] object-cover rounded-lg"
+        loading="lazy"
+      />
+      <div className="flex flex-col ml-3 w-[377px] h-[364px] justify-between">
+       
+      <div className=" w-[328px] h-[364px]  mx-auto sm:ml-6 sm:mt-0 ">
+        <h3 className="text-2xl font-bold text-red-500">{foodName}</h3>
+        <p className="text-gray-700 text-base mt-2">{ingredients}</p>
+        <div className="flex justify-between mt-30">
+         
+ <div className="flex flex-col text-black">
+      <p className="text-m ">Total price</p>
+        <p className="text-xl mt-0 font-semibold"> ${price.toFixed(2)}</p>
+        </div>
+        <div className="flex text-black items-center gap-4 mt-4">
+              <Button
+                onClick={decButton}
+                className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-00"
+                aria-label={`Decrease quantity of ${foodName}`}
               >
-                {/* <FoodDialog foods={foods} /> */}
-              </div>
+                <Minus size={16} />
+              </Button>
+              <span className="text-lg font-medium">{quantity}</span>
+              <Button
+                onClick={addButton}
+                className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-500"
+                aria-label={`Increase quantity of ${foodName}`}
+              >
+                <Plus size={16} />
+              </Button>
             </div>
-            <div className="p-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold text-red-500">
-                  {foodName}
-                </h3>
-                <p className="font-bold text-lg">${price.toFixed(2)}</p>
-              </div>
-              <p className="text-gray-600 text-sm mt-2 line-clamp-2">
-                {ingredients}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      </div>
+        </div>
+       
+      {onAddToCart && (
+              <Button
+                onClick={() => onAddToCart({ foodName, image, ingredients, price, _id, quantity })}
+                className="mt-6  bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                aria-label={`Add ${foodName} to cart`}
+              >
+                Add to Cart
+              </Button>
+            )}
+      </div>
+     
     </div>
+  </div>
+</DialogContent>
+
+    </Dialog>
   );
 };
+
