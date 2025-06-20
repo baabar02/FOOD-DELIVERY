@@ -1,13 +1,30 @@
+"use client";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { ChevronRight, MapPin, Pin, ShoppingCart, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/app/UserProvider";
 
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+
 export const Header = () => {
-  const { user, setUser } = useAuth();
+  const path = usePathname();
+  const arr = ["/login", "/signup"];
+
+  if (arr.includes(path)) {
+    return null;
+  }
+
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -16,8 +33,27 @@ export const Header = () => {
     router.push("/LogIn");
   };
 
+  const DeliveryAddressButton = () => (
+    <div className="flex w-[251px] h-[36px] gap-4 rounded-[16px] text-xs justify-center items-center bg-amber-50 cursor-pointer">
+      <p className="flex text-red-500 gap-2">
+        <MapPin className="w-[20px] h-[20px]" />
+        Delivery address:
+      </p>
+      <p className="flex text-gray-500 gap-2">
+        Add location
+        <ChevronRight className="w-[20px] h-[20px]" />
+      </p>
+    </div>
+  );
+
   return (
     <div className="flex w-full h-[172px] bg-[#18181B] mx-auto ">
+      <Button
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        onClick={() => router.push("/LogIn")}
+      >
+        Log in
+      </Button>
       <div className="mx-auto px-4 flex gap-4">
         <Image
           alt="Food Delivery App Logo"
@@ -35,17 +71,33 @@ export const Header = () => {
           className="object-contain"
         />
       </div>
+
       <div className="flex gap-4 mx-auto items-center">
-        <div className="flex w-[251px] h-[36px] gap-4 rounded-[16px] text-xs justify-center items-center content-center bg-amber-50">
-          <p className="flex text-red-500 gap-2">
-            <MapPin className="w-[20px] h-[20px]" />
-            Delivery address:
-          </p>
-          <p className="flex text-gray-500 gap-2">
-            Add location
-            <ChevronRight className="w-[20px] h-[20px]" />
-          </p>
-        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost">
+              <DeliveryAddressButton />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="flex flex-col border border-green-400 !w-[400px] !h-[200px] bg-white">
+            <div className="grid gap-3">
+              <label htmlFor="username-1">Add Location</label>
+              <Input
+                id="username-1"
+                name="location"
+                placeholder="location here..."
+              />
+            </div>
+
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <div className="bg-amber-50 w-[36px] h-[36px] flex items-center justify-center rounded-full">
           <ShoppingCart className="w-[16px] h-[16px]" />
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type FoodProps = {
@@ -13,14 +14,12 @@ type FoodProps = {
 
 type PropsType = {
   foods: Record<string, FoodProps[]>;
- 
 };
 
-
-
 export const Pizza = ({ foods }: PropsType) => {
-
-    const [selectedFood, setSelectedFood] = useState<FoodProps | null>(null)
+  const [selectedFood, setSelectedFood] = useState<FoodProps | null>(null);
+  const [prev, setPrev] = useState<Number>();
+  const router = useRouter();
 
   if (!foods || !foods["Pizza"]) return null;
 
@@ -28,14 +27,19 @@ export const Pizza = ({ foods }: PropsType) => {
     console.log(`Added ${food.foodName} to cart`);
   };
 
-
-  const handleEnlarge = (food:FoodProps) =>{
+  const handleEnlarge = (food: FoodProps) => {
     setSelectedFood(food);
-  }
+  };
 
-//   const handleClose =(food:FoodProps) =>{
-//     setSelectedFood();
-//   }
+  const keys = Object.keys(foods);
+  const names = keys.map((el) => {
+    return foods[el].map((food) => {
+      return food;
+    });
+  });
+
+  console.log(names);
+
   return (
     <div className="flex w-full bg-[#404040] mx-auto py-10 justify-center items-center">
       <div className="mb-8 w-full max-w-[1250px] px-4">
@@ -51,7 +55,6 @@ export const Pizza = ({ foods }: PropsType) => {
                   src={food.image}
                   alt={food.foodName}
                   className="w-full h-48 object-cover rounded-lg"
-                  
                 />
                 <Button
                   onClick={() => handleAddToCart(food)}
@@ -75,21 +78,18 @@ export const Pizza = ({ foods }: PropsType) => {
             </div>
           ))}
         </div>
-        
-            {selectedFood && (
+
+        {selectedFood && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
             role="dialog"
-            aria-labelledby="modal-title"
-            aria-modal="true"
-        
             onClick={() => {
-                return handleEnlarge(selectedFood);
+              return handleEnlarge(selectedFood);
             }}
           >
             <div
               className="bg-white rounded-lg shadow-lg p-6 w-full max-w-[600px] mx-4"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="relative">
                 <img
@@ -97,21 +97,22 @@ export const Pizza = ({ foods }: PropsType) => {
                   alt={selectedFood.foodName}
                   width={600}
                   height={300}
-                //   onClick={handleEnlarge}
+                  //   onClick={handleEnlarge}
                   className="w-full h-64 object-cover rounded-lg"
                 />
                 <Button
                   className="absolute top-2 right-2 text-2xl text-gray-600 hover:text-gray-800"
-                  onClick={() => {handleAddToCart(selectedFood);
-}}
-
+                  onClick={() => {
+                    handleAddToCart(selectedFood);
+                  }}
                   aria-label="Close enlarged view"
-                >
-                  &times;
-                </Button>
+                ></Button>
               </div>
               <div className="mt-4">
-                <h3 id="modal-title" className="text-2xl font-semibold text-red-500">
+                <h3
+                  id="modal-title"
+                  className="text-2xl font-semibold text-red-500"
+                >
                   {selectedFood.foodName}
                 </h3>
                 <p className="text-lg font-bold text-gray-800 mt-2">
@@ -121,7 +122,6 @@ export const Pizza = ({ foods }: PropsType) => {
                 <Button
                   onClick={() => {
                     handleAddToCart(selectedFood);
-                
                   }}
                   className="mt-4 bg-red-500 text-white hover:bg-red-600"
                   aria-label={`Add ${selectedFood.foodName} to cart`}
@@ -133,8 +133,6 @@ export const Pizza = ({ foods }: PropsType) => {
           </div>
         )}
       </div>
-    
-  
     </div>
   );
 };

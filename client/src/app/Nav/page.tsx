@@ -1,11 +1,5 @@
 import axios from "axios";
-
-import { Footer } from "./_components/Footer";
-import { Header } from "./_components/Header";
-import { Appetizer } from "./_components/Appetizer";
-import { Salad } from "./_components/Salad";
-import { usePathname } from 'next/navigation'
-import { Pizza } from "./_components/Pizza";
+import FoodPage from "../Add-food/page";
 
 type FoodProps = {
   foodName: string;
@@ -17,28 +11,11 @@ type FoodProps = {
 
 type PropsType = {
   foods: Record<string, FoodProps[]>;
-  onclick: ()=>void;
 };
 
-
-const NavPage = async ({foods}:PropsType) => {
- const arr = ['/login', '/signup']
-    const path = usePathname()
-
-    if (arr.includes(path)) {
-        return null
-    }
-
-
-  const { data } = await axios.get("http://localhost:8000/foods");
+const NavPage = async () => {
   return (
-    <div className="flex flex-col">
-      <Header />
-      <Appetizer foods={data.foods} />
-      <Salad foods={data.foods}/>
-      <Pizza  foods={data.foods}/>
-      <Footer />
-    </div>
+    <div className="flex flex-col">{/* <FoodPage foods={data.foods} /> */}</div>
   );
 };
 
