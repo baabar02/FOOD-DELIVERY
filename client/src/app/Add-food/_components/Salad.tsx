@@ -9,6 +9,7 @@ type FoodProps = {
   ingredients: string;
   price: number;
   _id: string;
+  address:string;
 };
 
 type PropsType = {
@@ -49,7 +50,7 @@ return (
                      ingredients={food.ingredients}
                      price={food.price}
                      _id={food._id}
-                     onAddToCart={handleAddToCart} 
+                    address={food.address}
                       />
                  </div>
                </div>
