@@ -1,158 +1,222 @@
+"use client";
 
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet"
-import { Minus, Plus, ShoppingCart } from "lucide-react"
-import image from "next/image"
-import { useState } from "react"
+} from "@/components/ui/sheet";
+import axios from "axios";
+import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { useEffect, useState } from "react";
 
+type FoodOrderProps = {
+  foodName: string;
+  image: string;
+  ingredients: string;
+  price: number;
+  _id: string;
+};
 
-// type FoodProps = {
-//   foodName: string;
-//   image: string;
-//   ingredients: string;
-//   price: number;
-//   _id: string;
-//   onAddToCart?: (food: FoodProps & {quantity:number}) => void;
-// };
+type CartItem = FoodOrderProps & {
+  quantity: number;
+  id: string;
+  index: number;
+  address: string;
+};
 
+export const OrderDetail = async () => {
+  const [open, setOpen] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-// type PropsType = {
-//   foods: Record<string, FoodProps[]>;
- 
-// };
+  useEffect(() => {
+    if (open) {
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      setCart(localCart);
+    }
+    const savedAddress = localStorage.getItem("deliveryAddress");
+    if (savedAddress) {
+      setAddressInput(JSON.parse(savedAddress));
+    }
+  }, [open]);
 
-//   const [quantity, setQuantity] =useState<number>(1)
+  const updatedCart = (newCart: CartItem[]) => {
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+  };
 
-// const addButton = () =>{
-// setQuantity((prev)=> prev + 1);
-// }
+  const incQuantity = (id: string) => {
+    const updatedCart = cart.map((item) =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    );
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
-// const decButton = () =>{
-//   setQuantity((prev)=> (prev > 1 ? prev - 1 : 1))
-// }
+  const decQuantity = (id: string) => {
+    const updatedCart = cart
+      .map((item) =>
+        item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+      )
+      .filter((item) => item.quantity > 0);
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
-export const OrderDetail = ()=> {
-  
+  const [addressInput, setAddressInput] = useState<string>("");
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAddressInput(value);
+    localStorage.setItem("deliveryAddress", JSON.stringify(value));
+  };
+  const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  ); // ? bagshaas asuuh
+
+  const handleCheckout = async () => {};
+
+  //     localStorage.setItem("userId", response.data.userId);
+
   return (
-   
-    <Sheet >
-      <SheetTrigger asChild >
-        <ShoppingCart/>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Button className="text-white">
+          <ShoppingCart className=" w-5 h-5" />
+        </Button>
       </SheetTrigger>
-      <SheetContent className="!max-w-[535px] h-[1024px]">
-        <SheetHeader>
-          <SheetTitle className="flex gap-3"><ShoppingCart/> Order detail</SheetTitle>
-          <div className="w-full h-[44px] bg-white shadow-md rounded-xl p-4 flex justify-between items-center">
-      <Button
-        className="bg-red-500 w-[227px] h-[36px] text-white hover:bg-red-600 px-6 py-2 rounded-2xl text-sm font-semibold"
-      >
-        Cart
-      </Button>
-      <Button
-        className=" w-[227px] h-[36px] bg-transparent text-gray-800 hover:bg-gray-200 px-6 py-2 rounded-r-2xl text-sm font-semibold"
-      >
-        Order
-      </Button>
-    </div>
-      
-         <SheetHeader>
-            My cart
-         </SheetHeader>
 
-{/* 
-          <div className="flex flex-col sm:flex-row items-center sm:items-start">
-      <img
-        src={image}
-        alt={foodName}
-        className="w-[377px]  h-[364px] object-cover rounded-lg"
-        loading="lazy"
-      />
-      <div className="flex flex-col ml-3 w-[377px] h-[364px] justify-between">
-       
-      <div className=" w-[328px] h-[364px]  mx-auto sm:ml-6 sm:mt-0 ">
-        <h3 className="text-2xl font-bold text-red-500">{foodName}</h3>
-        <p className="text-gray-700 text-base mt-2">{ingredients}</p>
-        <div className="flex justify-between mt-30">
-         
- <div className="flex flex-col text-black">
-      <p className="text-m ">Total price</p>
-        <p className="text-xl mt-0 font-semibold"> ${price.toFixed(2)}</p>
-        </div>
-        <div className="flex text-black items-center gap-4 mt-4">
-              <Button
-                onClick={decButton}
-                className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-00"
-                aria-label={`Decrease quantity of ${foodName}`}
-              >
-                <Minus size={16} />
-              </Button>
-              <span className="text-lg font-medium">{quantity}</span>
-              <Button
-                onClick={addButton}
-                className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-500"
-                aria-label={`Increase quantity of ${foodName}`}
-              >
-                <Plus size={16} />
-              </Button>
-            </div>
-      </div>
-        </div>
-       
-      {onAddToCart && (
-              <Button
-                onClick={() => onAddToCart({ foodName, image, ingredients, price, _id, quantity })}
-                className="mt-6  bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-                aria-label={`Add ${foodName} to cart`}
-              >
-                Add to Cart
-              </Button>
-            )}
-      </div>
-     
-    </div> */}
-          <SheetDescription>
-            Make changes to your profile here. Click save when you&apos;re done.
-          </SheetDescription>
+      <SheetContent className="bg-[#18181B] !max-w-[535px] h-[1024px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="text-amber-50 flex gap-3 items-center">
+            <ShoppingCart className="text-amber-50" />
+            Order Detail
+          </SheetTitle>
+          <div className="w-full h-[44px] bg-white shadow-md rounded-2xl p-2 flex justify-between items-center mt-2">
+            <Button className="bg-red-500 text-white w-[48%] h-[36px] rounded-2xl text-sm font-semibold">
+              Cart
+            </Button>
+            <Button className="bg-transparent text-gray-800 w-[48%] h-[36px] rounded-2xl text-sm font-semibold hover:bg-gray-200">
+              Order
+            </Button>
+          </div>
+          <p className="text-amber-50 mt-4">My Cart</p>
         </SheetHeader>
-        <div className="grid flex-1 auto-rows-min gap-6 px-4">
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-name">Name</Label>
-            <Input id="sheet-demo-name" defaultValue="Pedro Duarte" />
-          </div>
-          <div className="grid gap-3">
-            <Label htmlFor="sheet-demo-username">Username</Label>
-            <Input id="sheet-demo-username" defaultValue="@peduarte" />
+
+        <div className=" self-center max-w-[471px] mt-4 flex flex-col gap-4 rounded-2xl bg-white p-6">
+          {cart.length === 0 ? (
+            <p className="text-sm text-gray-500">Cart is empty.</p>
+          ) : (
+            cart.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between gap-4 border-b pb-2"
+              >
+                <img
+                  src={item.image}
+                  alt={item.foodName}
+                  className="w-20 h-20 rounded object-cover"
+                />
+                <div className="flex flex-col">
+                  <div className="flex-1">
+                    <p className="font-semibold">{item.foodName}</p>
+                    <p className="text-sm text-gray-500">
+                      {item.ingredients}
+                      {/* ${item.price} * {item.quantity} */}
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-black items-center gap-2">
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={() => decQuantity(item.id)}
+                        className="h-8 w-8 bg-gray-200 rounded-full hover:bg-gray-300"
+                        aria-label={`Decrease quantity of ${item.foodName}`}
+                      >
+                        <Minus size={16} />
+                      </Button>
+                      <span className="text-lg font-medium">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        onClick={() => incQuantity(item.id)}
+                        className="h-8 w-8 bg-gray-200 rounded-full hover:bg-gray-300"
+                        aria-label={`Increase quantity of ${item.foodName}`}
+                      >
+                        <Plus size={16} />
+                      </Button>
+                    </div>
+
+                    <p className="font-semibold">
+                      ${item.price * item.quantity}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+          <div>
+            <p className="">Delivery location</p>
+            <Input
+              className="h-[80px]"
+              onChange={handleOnChange}
+              value={addressInput}
+              placeholder="Please share your complete address"
+            />
+            {addressInput ? (
+              <p className="text-gray-500">{}</p>
+            ) : (
+              <p className="text-red-500 italic">
+                Please complete your address
+              </p>
+            )}
           </div>
         </div>
-        <SheetFooter>
-          <Button type="submit">Save changes</Button>
-          <SheetClose asChild>
-            <Button variant="outline">Close</Button>
-          </SheetClose>
-        </SheetFooter>
+
+        <div className="self-center w-[471px]  bg-white rounded-xl mt-6 p-4 flex flex-col gap-4">
+          <div className="flex justify-between">
+            <p className="font-semibold">Items</p>
+            <p>{totalQuantity}</p>
+          </div>
+          <div className="flex justify-between">
+            <p className="font-semibold">Shipping</p>
+            <p>$0.99</p>
+          </div>
+          <hr className="border-t border-dashed border-gray-400" />
+          <div className="flex justify-between text-lg font-bold">
+            <p>Total</p>
+            <p>${(totalPrice + 0.99).toFixed(2)}</p>
+          </div>
+          <Button className="bg-red-500 rounded-2xl text-amber-50">
+            Checkout
+          </Button>
+        </div>
       </SheetContent>
     </Sheet>
-  )
-}
+  );
+};
 
+// const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+// useEffect(() => {
+//   const userId = localStorage.getItem("userId");
+//   setIsLoggedIn(!!userId);
+// }, []);
 
-// const cartItem = foods["Appetizer"]?.[0] || {
-//     foodName: "Sunshine Stackers",
-//     image: "/images/default-food.jpg",
-//     ingredients: "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar",
-//     price: 12.99,
-//     _id: "default",
-//   };
+// const incQuantity = (index: number) => {
+//   const changedCard = [...cart];
+//   changedCard[index].quantity += 1;
+//   updatedCart(changedCard);
+// };
+
+// const decQuantity = (index: number) => {
+//   const changedCard = [...cart];
+//   if (changedCard[index].quantity > 1) {
+//   }
+//   changedCard[index].quantity -= 1;
+//   updatedCart(changedCard);
+// };

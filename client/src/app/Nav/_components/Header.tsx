@@ -1,5 +1,3 @@
-
-
 "use client";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
@@ -16,9 +14,8 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
-
 
 type FoodProps = {
   foodName: string;
@@ -26,17 +23,15 @@ type FoodProps = {
   ingredients: string;
   price: number;
   _id: string;
-  onAddToCart?: (food: FoodProps & {quantity:number}) => void;
+  address: string;
+  onAddToCart?: (food: FoodProps & { quantity: number }) => void;
 };
-
 
 type PropsType = {
   foods: Record<string, FoodProps[]>;
- 
 };
 
-
-export const Header = ({foods}:PropsType) => {
+export const Header = ({ foods }: PropsType) => {
   const path = usePathname();
   const arr = ["/login", "/signup"];
 
@@ -53,6 +48,14 @@ export const Header = ({foods}:PropsType) => {
     router.push("/LogIn");
   };
 
+  const [addressInput, setAddressInput] = useState<string>("");
+
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAddressInput(value);
+    localStorage.setItem("deliveryAddress", JSON.stringify(value));
+  };
+
   const DeliveryAddressButton = () => (
     <div className="flex w-[251px] h-[36px] gap-4 rounded-[16px] text-xs justify-center items-center bg-amber-50 cursor-pointer">
       <p className="flex text-red-500 gap-2">
@@ -65,6 +68,13 @@ export const Header = ({foods}:PropsType) => {
       </p>
     </div>
   );
+
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("deliveryAddress");
+    if (savedAddress) {
+      setAddressInput(JSON.parse(savedAddress));
+    }
+  }, []);
 
   return (
     <div className="flex w-full h-[172px] bg-[#18181B] mx-auto ">
@@ -106,6 +116,8 @@ export const Header = ({foods}:PropsType) => {
                 id="username-1"
                 name="location"
                 placeholder="location here..."
+                onChange={handleOnChange}
+                value={addressInput}
               />
             </div>
 
@@ -119,7 +131,6 @@ export const Header = ({foods}:PropsType) => {
         </Dialog>
 
         <div className="bg-amber-50 w-[36px] h-[36px] flex items-center justify-center rounded-full">
-       
           <OrderDetail />
         </div>
         <div className="bg-[#EF4444] w-[36px] h-[36px] flex items-center justify-center rounded-full text-amber-50">
@@ -135,3 +146,6 @@ export const Header = ({foods}:PropsType) => {
     </div>
   );
 };
+function setAddressInput(arg0: any) {
+  throw new Error("Function not implemented.");
+}
