@@ -32,11 +32,11 @@ export const Pizza = ({ foods }: PropsType) => {
     });
   });
 
-  console.log(names);
+  // console.log(names);
 
   return (
     <div className="flex w-full bg-[#404040] mx-auto py-10 justify-center items-center">
-      <div className="mb-8 w-full max-w-[1250px] px-4">
+      {/* <div className="mb-8 w-full max-w-[1250px] px-4">
         <h2 className="text-4xl font-bold text-amber-50 mb-6">Pizzas</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {foods["Pizza"].slice(0, 6).map((food) => {
@@ -80,7 +80,7 @@ export const Pizza = ({ foods }: PropsType) => {
             );
           })}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

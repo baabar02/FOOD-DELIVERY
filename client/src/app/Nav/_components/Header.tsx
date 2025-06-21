@@ -50,11 +50,11 @@ export const Header = ({ foods }: PropsType) => {
 
   const [addressInput, setAddressInput] = useState<string>("");
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setAddressInput(value);
-    localStorage.setItem("deliveryAddress", JSON.stringify(value));
-  };
+  // const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = e.target.value;
+  //   setAddressInput(value);
+  //   localStorage.setItem("deliveryAddress", JSON.stringify(value));
+  // };
 
   const DeliveryAddressButton = () => (
     <div className="flex w-[251px] h-[36px] gap-4 rounded-[16px] text-xs justify-center items-center bg-amber-50 cursor-pointer">
@@ -69,12 +69,12 @@ export const Header = ({ foods }: PropsType) => {
     </div>
   );
 
-  useEffect(() => {
-    const savedAddress = localStorage.getItem("deliveryAddress");
-    if (savedAddress) {
-      setAddressInput(JSON.parse(savedAddress));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const savedAddress = localStorage.getItem("deliveryAddress");
+  //   if (savedAddress) {
+  //     setAddressInput(JSON.parse(savedAddress));
+  //   }
+  // }, []);
 
   return (
     <div className="flex w-full h-[172px] bg-[#18181B] mx-auto ">
@@ -116,7 +116,7 @@ export const Header = ({ foods }: PropsType) => {
                 id="username-1"
                 name="location"
                 placeholder="location here..."
-                onChange={handleOnChange}
+                // onChange={handleOnChange}
                 value={addressInput}
               />
             </div>
@@ -146,6 +146,3 @@ export const Header = ({ foods }: PropsType) => {
     </div>
   );
 };
-function setAddressInput(arg0: any) {
-  throw new Error("Function not implemented.");
-}

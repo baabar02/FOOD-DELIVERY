@@ -35,7 +35,7 @@ export const FoodDialog = ({
       ingredients,
       image,
       quantity,
-      address,
+      // address,
     };
 
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -51,7 +51,7 @@ export const FoodDialog = ({
     }
 
     localStorage.setItem("cart", JSON.stringify(existingCart));
-    console.log("Cart updated:", existingCart);
+    // console.log("Cart updated:", existingCart);
   };
 
   const addButton = () => {
