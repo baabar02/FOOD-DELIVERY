@@ -4,6 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "./UserProvider";
 import { Header } from "./Nav/_components/Header";
 import { Footer } from "./Nav/_components/Footer";
+import { usePathname } from "next/navigation";
+
 
 
 
@@ -27,6 +29,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
+
   return (
     <html lang="en">
       <body
@@ -39,3 +44,4 @@ export default function RootLayout({
     </html>
   );
 }
+

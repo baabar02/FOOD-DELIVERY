@@ -15,7 +15,9 @@ type PropsType = {
 
 const NavPage = async () => {
   return (
-    <div className="flex flex-col">{/* <FoodPage foods={data.foods} /> */}</div>
+    <div className="flex flex-col">
+      {/* <FoodPage foods={data.foods} /> */}
+      </div>
   );
 };
 

@@ -16,24 +16,16 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
+import ForgotPassword from "@/app/ForgotPassword/page";
 
-type FoodProps = {
-  foodName: string;
-  image: string;
-  ingredients: string;
-  price: number;
-  _id: string;
-  address: string;
-  onAddToCart?: (food: FoodProps & { quantity: number }) => void;
-};
 
-type PropsType = {
-  foods: Record<string, FoodProps[]>;
-};
 
-export const Header = ({ foods }: PropsType) => {
+export const Header = () => {
+
+  
+
   const path = usePathname();
-  const arr = ["/login", "/signup"];
+  const arr = ["/LogIn", "/SignUp","ForgotPassword"];
 
   if (arr.includes(path)) {
     return null;

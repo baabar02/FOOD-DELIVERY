@@ -75,6 +75,15 @@ const Home = async () => {
       <Salad foods={data.foods} />
       <Pizza foods={data.foods} />
 
+    </div>
+  );
+};
+
+export default Home;
+
+
+
+
       {/* <input type="file" onChange={fileHandler} accept="image/*" />
       <Button onClick={uploadImage}>Upload</Button> */}
 
@@ -92,11 +101,7 @@ const Home = async () => {
         <Button onClick={createCategory}>Create Category</Button>
         {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div> */}
-    </div>
-  );
-};
 
-export default Home;
 
 // const handleLogout = () => {
 //   localStorage.removeItem("token");

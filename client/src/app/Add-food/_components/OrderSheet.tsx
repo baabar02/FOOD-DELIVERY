@@ -269,7 +269,7 @@ export const OrderDetail = () => {
         <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
           <DialogContent className="w-[400px] rounded-lg bg-white p-6" aria-labelledby="dialog-title">
             <DialogTitle>
- <div id="dialog-title" className="text-lg font-semibold">You're need to log in first</div>
+ <div id="dialog-title" className="text-lg font-semibold">You need to log in first</div>
             </DialogTitle>
            
             <p className="text-sm text-gray-600 mt-2">

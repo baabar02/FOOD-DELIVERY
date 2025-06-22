@@ -46,58 +46,30 @@ const LogInPage = () => {
     validationSchema: validationSchema,
 
 
-
-onSubmit: async (values) => {
-  try {
-    const response = await axios.post('http://localhost:8000/login', {
-      email: values.email,
-      password: values.password,
-    });
-    console.log('Login response:', response.data);
-
-    if (!response.data.token || !response.data.userId) {
-      throw new Error('Invalid login response: missing token or userId');
-    }
-
-const decoded: JwtPayload = jwtDecode(response.data.token);
-        if (!decoded.userId) {
-          throw new Error('No userId in token');
+    onSubmit: async (values) => {
+      console.log("asdfghjkl");
+      try {
+        const response = await axios.post("http://localhost:8000/login", {
+          email: values.email,
+          password: values.password,
+        });
+        console.log(response.data.message, "axios");
+        if (response.data.token) {
+          alert("Login successful");
         }
 
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('userId', response.data.userId);
-    alert('Login successful');
-    router.push('/');
-  } catch (err: any) {
-    const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
-    alert(errorMessage);
-  }
-},
-
-    // onSubmit: async (values) => {
-    //   console.log("asdfghjkl");
-    //   try {
-    //     const response = await axios.post("http://localhost:8000/login", {
-    //       email: values.email,
-    //       password: values.password,
-    //     });
-    //     console.log(response.data.message, "axios");
-    //     if (response.data.token) {
-    //       alert("Login successful");
-    //     }
-
-    //     localStorage.setItem("token", response.data.token);
-    //     localStorage.setItem("userId", response.data.userId);
-    //     // localStorage.setItem('userId', response.data.userId || response.data.user._id); ??? 
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("userId", response.data.userId);
+        // localStorage.setItem('userId', response.data.userId || response.data.user._id); ??? 
       
         
-    //     router.push("/");
-    //   } catch (err: any) {
-    //     const errorMessage =
-    //       err.response?.data?.message || "Error occured. try again";
-    //     alert(errorMessage);
-    //   }
-    // },
+        router.push("/");
+      } catch (err: any) {
+        const errorMessage =
+          err.response?.data?.message || "Error occured. try again";
+        alert(errorMessage);
+      }
+    },
   });
 
   return (
