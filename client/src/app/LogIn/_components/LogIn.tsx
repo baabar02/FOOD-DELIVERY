@@ -3,13 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Right from "./Right";
-import { ChevronLeft } from "lucide-react";
+
 import { useState } from "react";
-import { boolean, string } from "yup";
-import { error } from "console";
+
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
-import { InputPropsTypePage } from "../page";
+
 
 type InputPropsType = {
   values: { email: string; password: string };

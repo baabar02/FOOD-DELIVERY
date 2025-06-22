@@ -5,14 +5,15 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { writeFileSync } from "fs";
 import { LogIn } from "./_components/LogIn";
-// import VerifyPage from "../ForgotPassword/_components/Verify";
-// import ResetPage from "../ForgotPassword/_components/Reset";
 
 type FormValues = {
   email: string;
   password: string;
+};
+
+type JwtPayload = {
+  userId: string;
 };
 
 export type InputPropsTypePage = {
@@ -44,27 +45,59 @@ const LogInPage = () => {
     },
     validationSchema: validationSchema,
 
-    onSubmit: async (values) => {
-      console.log("asdfghjkl");
-      try {
-        const response = await axios.post("http://localhost:8000/login", {
-          email: values.email,
-          password: values.password,
-        });
-        console.log(response.data.message, "axios");
-        if (response.data.token) {
-          alert("Login successful");
+
+
+onSubmit: async (values) => {
+  try {
+    const response = await axios.post('http://localhost:8000/login', {
+      email: values.email,
+      password: values.password,
+    });
+    console.log('Login response:', response.data);
+
+    if (!response.data.token || !response.data.userId) {
+      throw new Error('Invalid login response: missing token or userId');
+    }
+
+const decoded: JwtPayload = jwtDecode(response.data.token);
+        if (!decoded.userId) {
+          throw new Error('No userId in token');
         }
 
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userId", response.data.userId);
-        router.push("/");
-      } catch (err: any) {
-        const errorMessage =
-          err.response?.data?.message || "Error occured. try again";
-        alert(errorMessage);
-      }
-    },
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('userId', response.data.userId);
+    alert('Login successful');
+    router.push('/');
+  } catch (err: any) {
+    const errorMessage = err.response?.data?.message || 'Login failed. Please try again.';
+    alert(errorMessage);
+  }
+},
+
+    // onSubmit: async (values) => {
+    //   console.log("asdfghjkl");
+    //   try {
+    //     const response = await axios.post("http://localhost:8000/login", {
+    //       email: values.email,
+    //       password: values.password,
+    //     });
+    //     console.log(response.data.message, "axios");
+    //     if (response.data.token) {
+    //       alert("Login successful");
+    //     }
+
+    //     localStorage.setItem("token", response.data.token);
+    //     localStorage.setItem("userId", response.data.userId);
+    //     // localStorage.setItem('userId', response.data.userId || response.data.user._id); ??? 
+      
+        
+    //     router.push("/");
+    //   } catch (err: any) {
+    //     const errorMessage =
+    //       err.response?.data?.message || "Error occured. try again";
+    //     alert(errorMessage);
+    //   }
+    // },
   });
 
   return (
@@ -85,3 +118,7 @@ const LogInPage = () => {
 };
 
 export default LogInPage;
+function jwtDecode(token: any): JwtPayload {
+  throw new Error("Function not implemented.");
+}
+

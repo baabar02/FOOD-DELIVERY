@@ -3,6 +3,7 @@ import { Appetizer } from "./Add-food/_components/Appetizer";
 import { Pizza } from "./Add-food/_components/Pizza";
 import { Salad } from "./Add-food/_components/Salad";
 
+
 type FoodProps = {
   foodName: string;
   image: string;

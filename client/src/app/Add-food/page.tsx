@@ -8,13 +8,14 @@ type FoodProps = {
   ingredients: string;
   price: number;
   _id: string;
+  address:string;
 };
 
 type PropsType = {
   foods: Record<string, FoodProps[]>;
 };
 
-const FoodPage = async ({ foods }: PropsType) => {
+const FoodPage = ({ foods }: PropsType) => {
   return (
     <div className="flex flex-col">
       <Appetizer foods={foods} />

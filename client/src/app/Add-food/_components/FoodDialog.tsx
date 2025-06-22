@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
-import { OrderDetail } from "./OrderSheet";
+
 
 type FoodProps = {
   foodName: string;
@@ -67,13 +67,14 @@ export const FoodDialog = ({
       <DialogTrigger asChild>
         <Plus />
       </DialogTrigger>
-      <DialogContent className="fixed z-50 flex items-center justify-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div className=" bg-white rounded-lg shadow-xl max-w-[826px] w-full h-[412px] p-6">
+   
+      <DialogContent className="z-50 flex items-center justify-center">
+        <div className=" bg-white rounded-lg shadow-xl border border-green-400  !max-w-[826px] !max-h-[412px] p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start">
             <img
               src={image}
               alt={foodName}
-              className="w-[377px]  h-[364px] object-cover rounded-lg"
+              className="w-[377px] h-[364px] object-cover rounded-lg"
               loading="lazy"
             />
             <div className="flex flex-col ml-3 w-[377px] h-[364px] justify-between">
