@@ -4,7 +4,9 @@ import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken";
 
 export const Login = async (request: Request, response: Response) => {
+  
   try {
+
     const { email, password } = request.body;
     console.log(email, password);
 
@@ -40,3 +42,4 @@ export const Login = async (request: Request, response: Response) => {
     response.status(401).send({ message: "Server error ?" });
   }
 };
+

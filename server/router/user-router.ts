@@ -14,3 +14,4 @@ UserRouter.put("/resend-verification", resendVerification);
 UserRouter.post("/sendOtp", sendOtp);
 UserRouter.post("/checkOtp", checkOtp);
 UserRouter.post("/reset-password", resetPassword);
+

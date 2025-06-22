@@ -32,8 +32,10 @@ export const FoodOrderSchema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: "Users", required: true },
   foodOrderItems: { type: [FoodOrderItemSchema], required: true },
   totalPrice: { type: Number, required: true },
+  address: { type: String, required: true },
   status: {
     type: String,
+    
     enum: Object.values(StatusEnum),
     default: StatusEnum.PENDING,
   },

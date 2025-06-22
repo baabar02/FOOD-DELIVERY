@@ -2,6 +2,9 @@ import router, { NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import { UserModel } from "../../model/usersModel";
+import axios from "axios";
+
+
 
 export const Verify = async (
   request: Request,
@@ -13,6 +16,9 @@ export const Verify = async (
   const tokenPassword = "foodDelivery";
 
   const isValid = jwt.verify(token, tokenPassword);
+
+// const result = await axios.post('http://localhost:8000/verify', { token });
+// console.log('Verify response bn uu:', result.data);
 
   try {
     const destructToken = jwt.decode(token);
