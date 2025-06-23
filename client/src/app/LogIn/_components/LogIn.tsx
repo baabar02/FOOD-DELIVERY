@@ -9,7 +9,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
-
 type InputPropsType = {
   values: { email: string; password: string };
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -30,7 +29,6 @@ export const LogIn = ({
   prevStep,
 }: InputPropsType) => {
   const [showPassword, setShowPassword] = useState(false);
-  console.log(showPassword, "asd");
   const router = useRouter();
   const togglePassword = () => setShowPassword((prev) => !prev);
 

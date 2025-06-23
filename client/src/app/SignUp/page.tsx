@@ -10,7 +10,7 @@ import { Password } from "./_components/Password";
 import Right from "./_components/Rigth";
 import axios from "axios";
 import { writeFileSync } from "fs";
-import { useAuth } from "../UserProvider";
+import { useAuth } from "../_components/UserProvider";
 
 type FormValues = {
   email: string;

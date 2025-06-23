@@ -2,7 +2,6 @@
 
 import React, {
   ReactNode,
-
   createContext,
   useContext,
   useEffect,
@@ -19,12 +18,12 @@ type UserData = {
 type AuthContextType = {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+  tokenChecker: (_token: string) => void;
 };
 
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  setUser: () => {},
-});
+export const AuthContext = createContext<AuthContextType>(
+  {} as AuthContextType
+);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
@@ -35,12 +34,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const response = await axios.post("http://localhost:8000/verify", {
         token: token,
       });
-      setUser({ userId: response.data.destructToken.userId });
-    } catch (err) {
-      console.log("Token verification failed", err);
-
-      router.push("/LogIn");  
-    }
+      setUser({ userId: response.data.userId });
+    } catch (err) {}
   };
 
   useEffect(() => {
@@ -49,12 +44,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (token) {
       tokenChecker(token);
     } else {
-      router.push("/LogIn");
+      // router.push("/LogIn");
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, tokenChecker }}>
       <div style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
         {children}
       </div>
@@ -96,9 +91,9 @@ export const useAuth = () => useContext<AuthContextType>(AuthContext);
 
 //   const tokenChecker = async (token: string) => {
 //     try {
-   
+
 //       await axios.post('http://localhost:8000/verify', { token });
-     
+
 //       const decoded: JwtPayload = jwtDecode(token);
 //       if (!decoded.userId) {
 //         throw new Error('No userId in token');

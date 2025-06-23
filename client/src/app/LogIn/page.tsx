@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { LogIn } from "./_components/LogIn";
+import { useAuth } from "../_components/UserProvider";
 
 type FormValues = {
   email: string;
@@ -37,6 +38,7 @@ const validationSchema = Yup.object({
 const LogInPage = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
+  const { tokenChecker } = useAuth();
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -45,25 +47,17 @@ const LogInPage = () => {
     },
     validationSchema: validationSchema,
 
-
     onSubmit: async (values) => {
-      console.log("asdfghjkl");
       try {
         const response = await axios.post("http://localhost:8000/login", {
           email: values.email,
           password: values.password,
         });
-        console.log(response.data.message, "axios");
-        if (response.data.token) {
-          alert("Login successful");
-        }
 
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userId", response.data.userId);
-        // localStorage.setItem('userId', response.data.userId || response.data.user._id); ??? 
-      
-        
-        router.push("/");
+        await tokenChecker(response.data.token);
+
+        redirect("/");
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message || "Error occured. try again";
@@ -90,7 +84,3 @@ const LogInPage = () => {
 };
 
 export default LogInPage;
-function jwtDecode(token: any): JwtPayload {
-  throw new Error("Function not implemented.");
-}
-

@@ -1,5 +1,4 @@
-
-import { useAuth } from "@/app/UserProvider";
+import { useAuth } from "@/app/_components/UserProvider";
 import { Button } from "@/components/ui/button";
 import { DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -16,7 +15,6 @@ import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
 type FoodOrderProps = {
   foodName: string;
   image: string;
@@ -28,7 +26,7 @@ type FoodOrderProps = {
 type CartItem = FoodOrderProps & {
   quantity: number;
   address: string;
-  userId:string;
+  userId: string;
 };
 
 export const OrderDetail = () => {
@@ -42,10 +40,14 @@ export const OrderDetail = () => {
 
   useEffect(() => {
     const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    console.log("localCart", localCart);
+
     setCart(localCart);
+
     const savedAddress = localStorage.getItem("deliveryAddress");
     if (savedAddress) {
-      setAddressInput(JSON.parse(savedAddress));
+      setAddressInput(savedAddress);
     }
   }, []);
 
@@ -66,7 +68,7 @@ export const OrderDetail = () => {
       newCart[index].quantity -= 1;
       updatedCart(newCart);
     } else {
-      newCart.splice(index, 1); 
+      newCart.splice(index, 1);
       updatedCart(newCart);
     }
   };
@@ -78,22 +80,28 @@ export const OrderDetail = () => {
   };
 
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setAddressInput(value);
-    localStorage.setItem("deliveryAddress", JSON.stringify(value));
+
+    localStorage.setItem("deliveryAddress", value);
   };
 
+  console.log(user, "asdsd");
+
   const handleCheckout = async () => {
-    if (!user) {
+    if (!user?.userId) {
       setShowLoginDialog(true);
       return;
     }
 
-    // const userId = localStorage.getItem("token");
-    const userId = user?.userId;
+    const userId = localStorage.getItem("token");
+
     if (!userId) {
       alert("User ID not found. Please log in again.");
       setShowLoginDialog(true);
@@ -111,21 +119,35 @@ export const OrderDetail = () => {
       address: addressInput,
       total: totalPrice + 0.99,
     };
+    // console.log("Checkout payload:", {
+    //   user: user.userId,
+    //   totalPrice: totalPrice + 0.99,
+    //   address: addressInput,
+    //   foodOrderItems: cart.map((item) => ({
+    //     food: item._id,
+    //     quantity: item.quantity,
+    //   })),
+    // });
 
     try {
-    
-    const response =  await axios.post("http://localhost:8000/food-order", {
-  user: user.userId, 
-  totalPrice: totalPrice + 0.99,
-  foodOrderItems: cart.map((item) => ({
-    food: item._id,
-    quantity: item.quantity,
-  })),
-}, {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-});
+      const response = await axios.post(
+        "http://localhost:8000/food-order",
+
+        {
+          user: user.userId,
+          totalPrice: totalPrice + 0.99,
+          address: addressInput,
+          foodOrderItems: cart.map((item) => ({
+            food: item._id,
+            quantity: item.quantity,
+          })),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
 
       console.log("Checkout successful:", response);
       setCart([]);
@@ -181,7 +203,7 @@ export const OrderDetail = () => {
             ) : (
               cart.map((item, index) => (
                 <div
-                  key={item._id}
+                  key={`${item._id}-${index}`}
                   className="flex items-center justify-between gap-4 border-b pb-2"
                 >
                   <img
@@ -201,7 +223,9 @@ export const OrderDetail = () => {
                         >
                           <Minus size={16} />
                         </Button>
-                        <span className="text-lg font-medium">{item.quantity}</span>
+                        <span className="text-lg font-medium">
+                          {item.quantity}
+                        </span>
                         <Button
                           onClick={() => incQuantity(index)}
                           className="h-8 w-8 bg-gray-200 rounded-full hover:bg-gray-300"
@@ -217,7 +241,9 @@ export const OrderDetail = () => {
                           <Trash2 size={16} className="text-red-500" />
                         </Button>
                       </div>
-                      <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -232,7 +258,9 @@ export const OrderDetail = () => {
                 className="mt-2"
               />
               {!addressInput && (
-                <p className="text-red-500 italic mt-1">Please provide a delivery address.</p>
+                <p className="text-red-500 italic mt-1">
+                  Please provide a delivery address.
+                </p>
               )}
             </div>
           </div>
@@ -262,65 +290,65 @@ export const OrderDetail = () => {
           </div>
         </SheetContent>
       </Sheet>
-      { }
-     
-
+      {}
       {!user && (
         <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-          <DialogContent className="w-[400px] rounded-lg bg-white p-6" aria-labelledby="dialog-title">
+          <DialogContent
+            className="w-[400px] rounded-lg bg-white p-6"
+            aria-labelledby="dialog-title"
+          >
             <DialogTitle>
- <div id="dialog-title" className="text-lg font-semibold">You need to log in first</div>
+              <div id="dialog-title" className="text-lg font-semibold">
+                You need to log in first
+              </div>
             </DialogTitle>
-           
+
             <p className="text-sm text-gray-600 mt-2">
               Please log in or create an account to continue checkout.
             </p>
-          
-              <Button
-                onClick={() => router.push("/SignUp")}
-                className="bg-blue-600 text-white rounded-full"
-                aria-label="Sign up"
-              >
-                Sign Up
-              </Button>
-              <Button
-                onClick={() => router.push("/LogIn")}
-                className="bg-gray-600 text-white rounded-full"
-                aria-label="Log in"
-              >
-                Log In
-              </Button>
-        
+
+            <Button
+              onClick={() => router.push("/SignUp")}
+              className="bg-blue-600 text-white rounded-full"
+              aria-label="Sign up"
+            >
+              Sign Up
+            </Button>
+            <Button
+              onClick={() => router.push("/LogIn")}
+              className="bg-gray-600 text-white rounded-full"
+              aria-label="Log in"
+            >
+              Log In
+            </Button>
           </DialogContent>
         </Dialog>
       )}
+      {user && (
+        <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+          <DialogContent
+            className="w-[400px] rounded-lg bg-white p-6"
+            aria-labelledby="dialog-title"
+          >
+            <div id="dialog-title" className="text-lg font-semibold">
+              Order Placed Successfully!
+            </div>
+            <p className="text-sm text-gray-600 mt-2">
+              Your order has been successfully placed. You will receive a
+              confirmation soon.
+            </p>
 
-       {user && (
-
-
-      
-<Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-      <DialogContent className="w-[400px] rounded-lg bg-white p-6" aria-labelledby="dialog-title">
-          <div id="dialog-title" className="text-lg font-semibold">Order Placed Successfully!</div>
-          <p className="text-sm text-gray-600 mt-2">
-               Your order has been successfully placed. You will receive a confirmation soon.
-             </p>
-          
-               <Button
-                 onClick={handleCloseSuccessDialog}
-                 className="bg-gray-600 text-white rounded-full"
-                 aria-label="Back to home"
-               >
-                 Back to Home
-               </Button>
-        
-           </DialogContent>
-</Dialog>
-        
-         
-     
-  
-      )};
+            <Button
+              onClick={handleCloseSuccessDialog}
+              className="bg-gray-600 text-white rounded-full"
+              aria-label="Back to home"
+            >
+              Back to Home
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
+      ;
     </>
   );
 };

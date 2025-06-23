@@ -4,7 +4,6 @@ import { DialogTitle } from "@/components/ui/dialog";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
-
 type FoodProps = {
   foodName: string;
   image: string;
@@ -30,7 +29,7 @@ export const FoodDialog = ({
 
   const handleAddToCart = () => {
     const foodData = {
-      id: _id,
+      _id,
       foodName,
       price,
       ingredients,
@@ -42,7 +41,7 @@ export const FoodDialog = ({
     const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
     const existingIndex = existingCart.findIndex(
-      (item: any) => item.id === foodData.id
+      (item: any) => item._id === foodData._id
     );
 
     if (existingIndex !== -1) {
@@ -69,9 +68,8 @@ export const FoodDialog = ({
         <Plus />
       </DialogTrigger>
 
-
-   <DialogTitle></DialogTitle>
-       <DialogContent className="z-50 w-full max-w-4xl max-h-[90vh] flex items-center justify-center">
+      <DialogTitle></DialogTitle>
+      <DialogContent className="z-50 w-full max-w-4xl max-h-[90vh] flex items-center justify-center">
         <div className="z-50 bg-white rounded-lg shadow-xl border border-green-400  !max-w-[826px] !max-h-[412px] p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start">
             <img
@@ -82,11 +80,7 @@ export const FoodDialog = ({
             />
             <div className="flex flex-col ml-3 w-[377px] h-[364px] justify-between">
               <div className=" w-[328px] h-[364px]  mx-auto sm:ml-6 sm:mt-0 ">
-
-   <h3 className="text-2xl font-bold text-red-500">{foodName}</h3>
-
-
-               
+                <h3 className="text-2xl font-bold text-red-500">{foodName}</h3>
 
                 <p className="text-gray-700 text-base mt-2">{ingredients}</p>
                 <div className="flex justify-between mt-30">
@@ -125,7 +119,7 @@ export const FoodDialog = ({
             </div>
           </div>
         </div>
-      </DialogContent> 
+      </DialogContent>
     </Dialog>
   );
 };
