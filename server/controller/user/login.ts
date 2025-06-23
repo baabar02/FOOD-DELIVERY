@@ -22,7 +22,7 @@ export const Login = async (request: Request, response: Response) => {
     //     .send({ message: " User password not found in DataBase" });
     // }
 
-    const isPasswordValid = await bcrypt.compareSync(password, user.password!);
+    const isPasswordValid = await bcrypt.compare(password, user.password!);
 
     const tokenPassword = "foodDelivery";
 

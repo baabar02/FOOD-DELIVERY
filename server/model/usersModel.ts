@@ -8,7 +8,7 @@ enum UserRoleEnum {
 }
 
 export type UserType = {
-  _id:String;
+  _id:string;
   // user: ObjectId;
   email: string;
   password: string;

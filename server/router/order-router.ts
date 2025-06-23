@@ -9,4 +9,8 @@ import { TokenChecker } from "../src/middleware/token-checker";
 export const OrderRouter = Router();
 
 OrderRouter.post("/food-order", TokenChecker, addFoodOrder);
-OrderRouter.get("/food-order", allOrder);
+OrderRouter.get("/food-order", TokenChecker, allOrder);
+
+
+
+
