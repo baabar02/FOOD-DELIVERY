@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import { UserModel } from "../../model/usersModel";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const Login = async (request: Request, response: Response) => {
-  
   try {
-
     const { email, password } = request.body;
     console.log(email, password);
 
@@ -34,7 +32,9 @@ export const Login = async (request: Request, response: Response) => {
       response.status(401).send({ message: " Wrong password, try again" });
       return;
     } else {
-      response.status(200).send({ message: "Successfully logged in ", token });
+      response
+        .status(200)
+        .send({ message: "Successfully logged in ", token, userId: user._id });
       return;
     }
   } catch (error) {
@@ -42,4 +42,3 @@ export const Login = async (request: Request, response: Response) => {
     response.status(401).send({ message: "Server error ?" });
   }
 };
-

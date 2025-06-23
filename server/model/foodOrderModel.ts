@@ -8,7 +8,7 @@ export enum StatusEnum {
 
 export type FoodOrder = {
   user: ObjectId;
-  totalPrice: Number;
+  totalPrice: number;
   foodOrderItems: FoodOrderItem[];
   status: StatusEnum;
   createdAt: Date;
@@ -17,7 +17,7 @@ export type FoodOrder = {
 
 type FoodOrderItem = {
   food: ObjectId;
-  quantity: Number;
+  quantity: number;
 };
 
 const FoodOrderItemSchema = new Schema(
@@ -35,7 +35,7 @@ export const FoodOrderSchema = new Schema({
   address: { type: String, required: true },
   status: {
     type: String,
-    
+
     enum: Object.values(StatusEnum),
     default: StatusEnum.PENDING,
   },
@@ -43,7 +43,4 @@ export const FoodOrderSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const FoodOrderModel = model<FoodOrderItem>(
-  "Food-Order",
-  FoodOrderSchema
-);
+export const FoodOrderModel = model<FoodOrder>("Food-Order", FoodOrderSchema);
