@@ -59,6 +59,8 @@ const LogInPage = () => {
 
         redirect("/");
       } catch (err: any) {
+        console.log("Login error", err);
+        
         const errorMessage =
           err.response?.data?.message || "Error occured. try again";
         alert(errorMessage);

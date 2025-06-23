@@ -6,6 +6,8 @@ import { XIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+
+
 function Dialog({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -18,10 +20,20 @@ function DialogTrigger({
   return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
 }
 
+function DialogPortalSafe({
+  children,
+  ...props
+}: React.ComponentProps<typeof DialogPrimitive.Portal>) {
+  if (typeof window === "undefined") return null; // SSR safe
+  return <DialogPrimitive.Portal {...props}>{children}</DialogPrimitive.Portal>;
+}
+
+
 function DialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  //  console.log("DialogPortal rendered");
+  return <DialogPrimitive.Portal {...props} />
 }
 
 function DialogClose({
@@ -55,7 +67,7 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   return (
-    <DialogPortal data-slot="dialog-portal">
+    <DialogPortalSafe>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
@@ -76,7 +88,7 @@ function DialogContent({
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
-    </DialogPortal>
+    </DialogPortalSafe>
   )
 }
 
