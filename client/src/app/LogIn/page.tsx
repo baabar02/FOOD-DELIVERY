@@ -53,14 +53,20 @@ const LogInPage = () => {
           email: values.email,
           password: values.password,
         });
+        console.log("after response");
 
-        localStorage.setItem("token", response.data.token);
-        await tokenChecker(response.data.token);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", response?.data?.token);
+        }
+        console.log("after localstorage set");
 
-        redirect("/");
+        tokenChecker(response?.data?.token);
+        console.log("after token");
+        router.push("/");
+        console.log("after redirect");
       } catch (err: any) {
         console.log("Login error", err);
-        
+
         const errorMessage =
           err.response?.data?.message || "Error occured. try again";
         alert(errorMessage);

@@ -88,7 +88,7 @@ export const Header = () => {
         <Dialog>
           <DialogTrigger asChild>
             {/* <Button variant="ghost"> */}
-              <DeliveryAddressButton />
+            <DeliveryAddressButton />
             {/* </Button> */}
           </DialogTrigger>
 

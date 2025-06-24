@@ -15,6 +15,7 @@ import axios from "axios";
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useFoodCart } from "@/app/_components/CardProvider";
 
 type FoodOrderProps = {
   foodName: string;
@@ -40,9 +41,11 @@ type Order = {
 };
 
 export const OrderDetail = () => {
+  const { cart, removeCartFood, incQuantity, decQuantity, clearCard } =
+    useFoodCart();
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<"cart" | "history">("cart");
-  const [cart, setCart] = useState<CartItem[]>([]);
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [addressInput, setAddressInput] = useState<string>("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -51,9 +54,6 @@ export const OrderDetail = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
-    console.log("localCart:", localCart);
-    setCart(localCart);
     const savedAddress = localStorage.getItem("deliveryAddress");
     if (savedAddress) {
       setAddressInput(savedAddress);
@@ -64,13 +64,18 @@ export const OrderDetail = () => {
     if (view === "history" && user?.userId) {
       const fetchOrders = async () => {
         try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            alert("You must logged in");
+          }
           const response = await axios.get("http://localhost:8000/food-order", {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           });
           console.log("Fetched orders:", response.data);
-          setOrders(response.data.data); // Access 'data' from response
+
+          setOrders(response.data.data);
         } catch (error) {
           console.error("Fetch order history error:", error);
         }
@@ -79,36 +84,17 @@ export const OrderDetail = () => {
     }
   }, [view, user]);
 
-  const updatedCart = (newCart: CartItem[]) => {
-    setCart(newCart);
-    localStorage.setItem("cart", JSON.stringify(newCart));
-  };
+  const handleOrder = () => {};
 
-  const incQuantity = (index: number) => {
-    const newCart = [...cart];
-    newCart[index].quantity += 1;
-    updatedCart(newCart);
-  };
-
-  const decQuantity = (index: number) => {
-    const newCart = [...cart];
-    if (newCart[index].quantity > 1) {
-      newCart[index].quantity -= 1;
-      updatedCart(newCart);
-    } else {
-      newCart.splice(index, 1);
-      updatedCart(newCart);
-    }
-  };
-
-  const removeItem = (index: number) => {
-    const newCart = [...cart];
-    newCart.splice(index, 1);
-    updatedCart(newCart);
+  const removeItem = (foodId: string) => {
+    removeCartFood(foodId);
   };
 
   const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPrice = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const totalPrice = cart.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -137,13 +123,16 @@ export const OrderDetail = () => {
     );
     if (invalidItem) {
       console.error("Invalid _id found in cart:", invalidItem);
-      alert(`Invalid food ID detected in cart: ${invalidItem._id || "undefined"}`);
+      alert(
+        `Invalid food ID detected in cart: ${invalidItem._id || "undefined"}`
+      );
       return;
     }
 
     try {
       const response = await axios.post(
         "http://localhost:8000/food-order",
+
         {
           user: user.userId,
           totalPrice: totalPrice + 0.99,
@@ -161,14 +150,17 @@ export const OrderDetail = () => {
       );
 
       console.log("Checkout successful:", response);
-      setCart([]);
+      clearCard();
       localStorage.setItem("cart", JSON.stringify([]));
       setAddressInput("");
       localStorage.removeItem("deliveryAddress");
       setShowSuccessDialog(true);
     } catch (error: any) {
       console.error("Checkout error:", error);
-      alert(error.response?.data?.message || "Failed to place order. Please try again.");
+      alert(
+        error.response?.data?.message ||
+          "Failed to place order. Please try again."
+      );
     }
   };
 
@@ -240,7 +232,9 @@ export const OrderDetail = () => {
                       />
                       <div className="flex flex-col flex-1">
                         <p className="font-semibold">{item.foodName}</p>
-                        <p className="text-sm text-gray-500">{item.ingredients}</p>
+                        <p className="text-sm text-gray-500">
+                          {item.ingredients}
+                        </p>
                         <div className="flex justify-between items-center mt-2">
                           <div className="flex gap-3 items-center">
                             <Button
@@ -250,7 +244,9 @@ export const OrderDetail = () => {
                             >
                               <Minus size={16} />
                             </Button>
-                            <span className="text-lg font-medium">{item.quantity}</span>
+                            <span className="text-lg font-medium">
+                              {item.quantity}
+                            </span>
                             <Button
                               onClick={() => incQuantity(index)}
                               className="h-8 w-8 bg-gray-200 rounded-full hover:bg-gray-300"
@@ -259,7 +255,7 @@ export const OrderDetail = () => {
                               <Plus size={16} />
                             </Button>
                             <Button
-                              onClick={() => removeItem(index)}
+                              onClick={() => removeItem(item._id)}
                               className="h-8 w-8 bg-red-100 rounded-full hover:bg-red-200"
                               aria-label={`Remove ${item.foodName} from cart`}
                             >
@@ -318,29 +314,34 @@ export const OrderDetail = () => {
           {view === "history" && (
             <div className="self-center max-w-[471px] mt-4 flex flex-col gap-4 rounded-2xl bg-white p-6">
               {orders.length === 0 ? (
-                <p className="text-sm text-gray-500">No order history available.</p>
+                <p className="text-sm text-gray-500">
+                  No order history available.
+                </p>
               ) : (
                 orders.map((order) => (
-                  <div
-                    key={order._id}
-                    className="border-b pb-4 mb-4"
-                  >
-                    <p className="font-semibold">Order #{order._id.slice(-6)}</p>
+                  <div key={order._id} className="border-b pb-4 mb-4">
+                    <p className="font-semibold">
+                      Order #{order._id.slice(-6)}
+                    </p>
                     <p className="text-sm text-gray-500">
                       Placed on {new Date(order.createdAt).toLocaleDateString()}
                     </p>
-                    <p className="text-sm text-gray-500">Status: {order.status}</p>
-                    <p className="text-sm text-gray-500">Delivery: {order.address}</p>
+                    <p className="text-sm text-gray-500">
+                      Status: {order.status}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Delivery: {order.address}
+                    </p>
                     {order.foodOrderItems.map((item, index) => (
                       <div
                         key={`${item.food._id}-${index}`}
                         className="flex items-center justify-between gap-4 mt-2"
                       >
-                        <img
+                        {/* <img
                           src={item.food.image}
                           alt={item.food.foodName}
                           className="w-16 h-16 rounded object-cover"
-                        />
+                        /> */}
                         <div className="flex flex-col flex-1">
                           <p className="font-medium">{item.food.foodName}</p>
                           <p className="text-sm text-gray-500">
@@ -394,7 +395,8 @@ export const OrderDetail = () => {
             Order Placed Successfully!
           </DialogTitle>
           <p className="text-sm text-gray-600 mt-2">
-            Your order has been successfully placed. You will receive a confirmation soon.
+            Your order has been successfully placed. You will receive a
+            confirmation soon.
           </p>
           <Button
             onClick={handleCloseSuccessDialog}

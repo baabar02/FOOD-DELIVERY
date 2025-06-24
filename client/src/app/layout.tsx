@@ -4,7 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "./_components/UserProvider";
 import { Header } from "./Nav/_components/Header";
 import { Footer } from "./Nav/_components/Footer";
-import { usePathname } from "next/navigation";
+import { FoodCartProvider } from "./_components/CardProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +32,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <Header />
-          {children}
-          <Footer />
+          <FoodCartProvider>
+            <Header />
+            {children}
+            <Footer />
+          </FoodCartProvider>
         </AuthProvider>
       </body>
     </html>
