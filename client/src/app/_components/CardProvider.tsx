@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronRight, MapPin } from "lucide-react";
 import {
   createContext,
   ReactNode,
@@ -28,6 +29,7 @@ type FoodCartContextType = {
   clearCard: () => void;
   incQuantity: (index: number) => void;
   decQuantity: (index: number) => void;
+  
 };
 
 const FoodCartContext = createContext<FoodCartContextType>(
@@ -88,6 +90,10 @@ export const FoodCartProvider = ({ children }: FoodCartProviderProps) => {
     setCart(localCart);
   }, []);
 
+
+ 
+
+
   return (
     <FoodCartContext
       value={{
@@ -97,6 +103,7 @@ export const FoodCartProvider = ({ children }: FoodCartProviderProps) => {
         incQuantity,
         decQuantity,
         clearCard,
+      
       }}
     >
       {children}

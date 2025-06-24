@@ -1,7 +1,15 @@
+'use client'
 import { Copyright, Link } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export const Footer = () => {
+
+    const path = usePathname();
+    const arr = ["/LogIn", "/SignUp", "/ForgotPassword"];
+  
+    if (arr.includes(path)) return null;
+
   return (
     <div className="flex w-full h-[775px] bg-[#18181B]">
       <div className="flex flex-col mx-auto">

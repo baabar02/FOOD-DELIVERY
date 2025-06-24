@@ -26,11 +26,11 @@ const ForgotPassword = () => {
   ];
   const Stepper = Components[currentStep];
 
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
-  }, [user, router]);
+  // useEffect(() => {
+  //   if (user) {
+  //     router.push("/");
+  //   }
+  // }, [user, router]);
 
   return (
     <div className="flex justify-center items-center min-h-screen">

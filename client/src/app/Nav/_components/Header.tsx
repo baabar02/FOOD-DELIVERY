@@ -13,23 +13,28 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
 
 export const Header = () => {
   const path = usePathname();
-  const arr = ["/LogIn", "/SignUp", "ForgotPassword"];
+  const arr = ["/LogIn", "/SignUp", "/ForgotPassword"];
 
   if (arr.includes(path)) return null;
 
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const router = useRouter();
+
+const handleLogin = () => {
+    router.push("/LogIn");
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
     router.push("/LogIn");
   };
+
 
   const [addressInput, setAddressInput] = useState<string>("");
 
@@ -58,14 +63,7 @@ export const Header = () => {
   );
 
   return (
-    <div className="flex w-full h-[172px] bg-[#18181B] mx-auto">
-      <Button
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={() => router.push("/LogIn")}
-      >
-        Log in
-      </Button>
-
+<div className="flex w-full h-[172px] sticky top-0 z-50 bg-[#18181B] mx-auto">
       <div className="mx-auto px-4 flex gap-4">
         <Image
           alt="Food Delivery App Logo"
@@ -85,13 +83,13 @@ export const Header = () => {
       </div>
 
       <div className="flex gap-4 mx-auto items-center">
+
         <Dialog>
           <DialogTrigger asChild>
-            {/* <Button variant="ghost"> */}
-            <DeliveryAddressButton />
-            {/* </Button> */}
+            <Button variant="ghost">
+              <DeliveryAddressButton />
+            </Button>
           </DialogTrigger>
-
           <DialogContent className="flex flex-col border border-green-400 !w-[400px] !h-[200px] bg-white">
             <div className="grid gap-3">
               <label htmlFor="username-1">Add Location</label>
@@ -103,7 +101,6 @@ export const Header = () => {
                 value={addressInput}
               />
             </div>
-
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
@@ -119,15 +116,42 @@ export const Header = () => {
           <OrderDetail />
         </div>
 
-        <div className="bg-[#EF4444] w-[36px] h-[36px] flex items-center justify-center rounded-full text-amber-50">
-          <Button
-            className="bg-[#EF4444] w-[36px] h-[36px] flex items-center justify-center rounded-full text-amber-50"
-            type="button"
-            onClick={handleLogout}
-          >
-            <User className="w-[16px] h-[16px]" />
-          </Button>
-        </div>
+      
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className="bg-[#EF4444] w-[36px] h-[36px] flex items-center justify-center rounded-full text-amber-50"
+              type="button"
+            >
+              <User className="w-[16px] h-[16px]" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className=" flex flex-col border border-red-400 !w-[300px] !h-[200px] bg-white">
+            <div className="flex flex-col gap-4 p-4">
+              <h3 className="text-lg font-semibold">Account</h3>
+              {user ? (
+                <Button
+                  className="bg-gray-500 text-white hover:bg-red-600"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  className="bg-blue-500 text-white hover:bg-blue-600"
+                  onClick={handleLogin}
+                >
+                  Login
+                </Button>
+              )}
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

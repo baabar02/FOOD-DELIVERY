@@ -84,7 +84,6 @@ export const OrderDetail = () => {
     }
   }, [view, user]);
 
-  const handleOrder = () => {};
 
   const removeItem = (foodId: string) => {
     removeCartFood(foodId);
@@ -131,7 +130,7 @@ export const OrderDetail = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/food-order",
+        "http://localhost:8000/create-order",
 
         {
           user: user.userId,
@@ -168,6 +167,11 @@ export const OrderDetail = () => {
     setShowSuccessDialog(false);
     router.push("/");
   };
+
+  const clearOrderHistory = (_id:string) =>{
+    const updateHistory = orders.filter((foodOrder)=> foodOrder._id !==_id);
+    setOrders(updateHistory);
+  }
 
   return (
     <>
@@ -312,9 +316,9 @@ export const OrderDetail = () => {
           )}
 
           {view === "history" && (
-            <div className="self-center max-w-[471px] mt-4 flex flex-col gap-4 rounded-2xl bg-white p-6">
+            <div className=" max-w-[471px] mt-4 ml-4 flex flex-col gap-4 rounded-2xl bg-white p-6">
               {orders.length === 0 ? (
-                <p className="text-sm text-gray-500">
+                <p className="w-full text-sm text-gray-500">
                   No order history available.
                 </p>
               ) : (
@@ -337,15 +341,11 @@ export const OrderDetail = () => {
                         key={`${item.food._id}-${index}`}
                         className="flex items-center justify-between gap-4 mt-2"
                       >
-                        {/* <img
-                          src={item.food.image}
-                          alt={item.food.foodName}
-                          className="w-16 h-16 rounded object-cover"
-                        /> */}
+                       
                         <div className="flex flex-col flex-1">
                           <p className="font-medium">{item.food.foodName}</p>
-                          <p className="text-sm text-gray-500">
-                            Quantity: {item.quantity}
+                          <p className="flex content-between text-sm text-gray-500">
+                            <p>Quantity:</p> <p>{item.quantity}</p>
                           </p>
                           <p className="text-sm font-semibold">
                             ${(item.food.price * item.quantity).toFixed(2)}
@@ -356,6 +356,7 @@ export const OrderDetail = () => {
                     <p className="font-bold mt-2">
                       Total: ${order.totalPrice.toFixed(2)}
                     </p>
+                    <Button  ><Trash2 /></Button>
                   </div>
                 ))
               )}
@@ -392,12 +393,16 @@ export const OrderDetail = () => {
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
         <DialogContent className="w-[400px] rounded-lg bg-white p-6">
           <DialogTitle id="dialog-title" className="text-lg font-semibold">
-            Order Placed Successfully!
+            Your order has been Successfully placed!
           </DialogTitle>
-          <p className="text-sm text-gray-600 mt-2">
-            Your order has been successfully placed. You will receive a
-            confirmation soon.
-          </p>
+          <div className="flex justify-center">
+          <img 
+          alt="confirmation"
+          src="./illustration.png"
+          className="self-center text-sm text-gray-600 mt-2">
+          </img>
+          </div>
+        
           <Button
             onClick={handleCloseSuccessDialog}
             className="bg-gray-600 text-white rounded-full"
