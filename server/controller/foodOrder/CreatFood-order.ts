@@ -21,9 +21,9 @@ export const CreateFoodOrder = async (request: Request, response: Response) => {
 
     for (const [index, item] of foodOrderItems.entries()) {
       if (!item.food || !Types.ObjectId.isValid(item.food)) {
-        console.log(index);
-        console.log(item);
-        console.log(foodOrderItems);
+        // console.log(index);
+        // console.log(item);
+        // console.log(foodOrderItems);
 
         return response.status(400).send({
           message: `Invalid food ID at index ${index}: ${item.food}`,

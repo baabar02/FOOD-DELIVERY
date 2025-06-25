@@ -2,13 +2,13 @@ import mongoose, { model } from "mongoose";
 import cors from "cors";
 import { Schema } from "mongoose";
 
-enum UserRoleEnum {
+export enum UserRoleEnum {
   USER = "USER",
   ADMIN = "ADMIN",
 }
 
 export type UserType = {
-  _id:string;
+  _id: string;
   // user: ObjectId;
   email: string;
   password: string;
@@ -28,7 +28,12 @@ export const UserSchema = new Schema<UserType>({
   password: { type: String, required: true },
   phoneNumber: { type: String, required: false },
   address: { type: String, required: false },
-  role: { type: String, enum: ["ADMIN", "USER"], required: false },
+  role: {
+    type: String,
+    enum: ["ADMIN", "USER"],
+    required: false,
+    default: UserRoleEnum.USER,
+  },
 
   id: { type: String },
   // orderedFoods: [{ type: Schema.Types.ObjectId, ref: "FoodOrder" }],
@@ -39,6 +44,6 @@ export const UserSchema = new Schema<UserType>({
   updatedAt: { type: Date, default: Date.now },
 });
 
-UserSchema.index({email: 1}, {unique:true});
+UserSchema.index({ email: 1 }, { unique: true });
 
 export const UserModel = model<UserType>("Users", UserSchema);

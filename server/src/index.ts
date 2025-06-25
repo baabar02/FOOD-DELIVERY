@@ -6,7 +6,8 @@ import { CategoryRouter } from "../router/category-router";
 import { FoodRouter } from "../router/food-router";
 import { OrderRouter } from "../router/order-router";
 import { DeleteRouter } from "../router/user-delete.router";
-import { DeleteHistoryRouter } from "../router/order-history-router";
+import { DeleteHistoryRouter } from "../router/delete-history-router";
+import { AdminRouter } from "../router/admin-router";
 
 const app = express();
 app.use(express.json());
@@ -36,7 +37,8 @@ app.use(CategoryRouter);
 app.use(FoodRouter);
 app.use(OrderRouter);
 app.use(DeleteRouter);
-app.use(DeleteHistoryRouter)
+app.use(DeleteHistoryRouter);
+app.use(AdminRouter);
 
 app.listen(8000, () => {
   console.log(`running on http://localhost:8000`);
