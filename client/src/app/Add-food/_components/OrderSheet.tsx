@@ -84,7 +84,6 @@ export const OrderDetail = () => {
     }
   }, [view, user]);
 
-
   const removeItem = (foodId: string) => {
     removeCartFood(foodId);
   };
@@ -168,10 +167,20 @@ export const OrderDetail = () => {
     router.push("/");
   };
 
-  const clearOrderHistory = (_id:string) =>{
-    const updateHistory = orders.filter((foodOrder)=> foodOrder._id !==_id);
-    setOrders(updateHistory);
-  }
+  const clearOrderHistory = async (id: string) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`http://localhost:8000/clear-order/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const remaining = orders.filter((item) => item._id != id);
+      setOrders(remaining);
+    } catch (error: any) {
+      console.error("error occured");
+    }
+  };
 
   return (
     <>
@@ -341,11 +350,10 @@ export const OrderDetail = () => {
                         key={`${item.food._id}-${index}`}
                         className="flex items-center justify-between gap-4 mt-2"
                       >
-                       
                         <div className="flex flex-col flex-1">
                           <p className="font-medium">{item.food.foodName}</p>
                           <p className="flex content-between text-sm text-gray-500">
-                            <p>Quantity:</p> <p>{item.quantity}</p>
+                            Quantity:{item.quantity}
                           </p>
                           <p className="text-sm font-semibold">
                             ${(item.food.price * item.quantity).toFixed(2)}
@@ -356,7 +364,12 @@ export const OrderDetail = () => {
                     <p className="font-bold mt-2">
                       Total: ${order.totalPrice.toFixed(2)}
                     </p>
-                    <Button  ><Trash2 /></Button>
+                    <Button
+                      className="font-bold mt-2"
+                      onClick={() => clearOrderHistory(order._id)}
+                    >
+                      <Trash2 />
+                    </Button>
                   </div>
                 ))
               )}
@@ -396,13 +409,13 @@ export const OrderDetail = () => {
             Your order has been Successfully placed!
           </DialogTitle>
           <div className="flex justify-center">
-          <img 
-          alt="confirmation"
-          src="./illustration.png"
-          className="self-center text-sm text-gray-600 mt-2">
-          </img>
+            <img
+              alt="confirmation"
+              src="./illustration.png"
+              className="self-center text-sm text-gray-600 mt-2"
+            ></img>
           </div>
-        
+
           <Button
             onClick={handleCloseSuccessDialog}
             className="bg-gray-600 text-white rounded-full"
