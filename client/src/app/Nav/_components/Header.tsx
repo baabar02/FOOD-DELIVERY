@@ -18,7 +18,7 @@ import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
 
 export const Header = () => {
   const path = usePathname();
-  const arr = ["/LogIn", "/SignUp", "/ForgotPassword"];
+  const arr = ["/LogIn", "/SignUp", "/ForgotPassword", '/admin/orders',"/admin/menu"];
 
   if (arr.includes(path)) return null;
 
