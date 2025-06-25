@@ -5,6 +5,10 @@ import bcrypt from "bcrypt";
 
  const signUp = async (request: Request, response: Response) => {
   const { email, password } = request.body;
+  
+if (!email || !password || typeof email !== "string" || typeof password !== "string") {
+    return response.status(400).send({ message: "Email and password are required" });
+  }
 
   const isEmailExisted = await UserModel.findOne({ email });
   if (!isEmailExisted) {
