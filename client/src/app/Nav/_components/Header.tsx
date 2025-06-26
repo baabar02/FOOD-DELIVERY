@@ -13,28 +13,33 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import {  useState } from "react";
+import { useState } from "react";
 import { OrderDetail } from "@/app/Add-food/_components/OrderSheet";
 
 export const Header = () => {
   const path = usePathname();
-  const arr = ["/LogIn", "/SignUp", "/ForgotPassword", '/admin/orders',"/admin/menu"];
+  const arr = [
+    "/LogIn",
+    "/SignUp",
+    "/ForgotPassword",
+    "/admin/orders",
+    "/admin/menu",
+  ];
 
   if (arr.includes(path)) return null;
 
   const { user, setUser } = useAuth();
   const router = useRouter();
 
-const handleLogin = () => {
+  const handleLogin = () => {
     router.push("/LogIn");
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setUser(null);
+    setUser(undefined);
     router.push("/LogIn");
   };
-
 
   const [addressInput, setAddressInput] = useState<string>("");
 
@@ -63,7 +68,7 @@ const handleLogin = () => {
   );
 
   return (
-<div className="flex w-full h-[172px] sticky top-0 z-50 bg-[#18181B] mx-auto">
+    <div className="flex w-full h-[172px] sticky top-0 z-50 bg-[#18181B] mx-auto">
       <div className="mx-auto px-4 flex gap-4">
         <Image
           alt="Food Delivery App Logo"
@@ -83,7 +88,6 @@ const handleLogin = () => {
       </div>
 
       <div className="flex gap-4 mx-auto items-center">
-
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="ghost">
@@ -116,7 +120,6 @@ const handleLogin = () => {
           <OrderDetail />
         </div>
 
-      
         <Dialog>
           <DialogTrigger asChild>
             <Button

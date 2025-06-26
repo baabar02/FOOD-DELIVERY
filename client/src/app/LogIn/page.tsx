@@ -38,7 +38,8 @@ const validationSchema = Yup.object({
 const LogInPage = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const { tokenChecker } = useAuth();
+  const { user, tokenChecker } = useAuth();
+  console.log(user, "from page");
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -53,17 +54,16 @@ const LogInPage = () => {
           email: values.email,
           password: values.password,
         });
+
         console.log("after response");
 
         if (typeof window !== "undefined") {
           localStorage.setItem("token", response?.data?.token);
         }
-        console.log("after localstorage set");
-
         tokenChecker(response?.data?.token);
-        console.log("after token");
-        router.push("/");
-        console.log("after redirect");
+
+        console.log("after localstorage set");
+        console.log(user, "USER");
       } catch (err: any) {
         console.log("Login error", err);
 
