@@ -26,7 +26,10 @@ export const Login = async (request: Request, response: Response) => {
 
     const tokenPassword = "foodDelivery";
 
-    const token = jwt.sign({ userId: user._id }, tokenPassword);
+    const token = jwt.sign(
+      { userId: user._id, isAdmin: user.role === "ADMIN" ? true : false },
+      tokenPassword
+    );
 
     if (!isPasswordValid) {
       response.status(401).send({ message: " Wrong password, try again" });
