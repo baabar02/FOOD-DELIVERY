@@ -72,9 +72,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser, tokenChecker }}>
-      <div style={{ backgroundColor: "#f0f0f0", minHeight: "100vh" }}>
+   
         {children}
-      </div>
+   
     </AuthContext.Provider>
   );
 };
