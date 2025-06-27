@@ -3,15 +3,14 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
-import { useState } from "react";
 
 type FoodValues = {
   categoryName: string;
 };
 
-type CategoryPageProps = {
-  onCreatedCategory: (categoryName: string) => void;
-};
+type Props = {
+  onCreatedCategory:(categoryName:string) => void;
+}
 
 const FoodValidationSchema = Yup.object({
   categoryName: Yup.string()
@@ -20,9 +19,8 @@ const FoodValidationSchema = Yup.object({
     .max(50, "Category name must not exceed 50 characters"),
 });
 
-const CategoryPage = ({ onCreatedCategory }: CategoryPageProps) => {
+const CategoryPage = ({onCreatedCategory}:Props) => {
   const router = useRouter();
-const [categoryName, setCategoryName] = useState("");
 
   const formik = useFormik<FoodValues>({
     initialValues: {
@@ -30,6 +28,7 @@ const [categoryName, setCategoryName] = useState("");
     },
     validationSchema: FoodValidationSchema,
     onSubmit: async (values) => {
+      onCreatedCategory(values.categoryName);
       try {
         const token = localStorage.getItem("token");
 
@@ -44,7 +43,7 @@ const [categoryName, setCategoryName] = useState("");
         );
 
         alert(response.data.message);
-        router.push("/categories");
+       
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message || "An error occurred. Please try again.";

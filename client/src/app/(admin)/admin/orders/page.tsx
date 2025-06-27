@@ -65,7 +65,7 @@ const AdminOrderPage = () => {
       setSelectedOrderId(removed);
     }
   };
-  console.log(selectedOrderId, "hhha");
+  // console.log(selectedOrderId, "hhha");
 
   const statusHandlerAction = (orderStatus: orderStatusType) => {
     setOrderStatus(orderStatus);
@@ -94,7 +94,7 @@ const AdminOrderPage = () => {
         { orders: prepare },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(prepare, "ppp");
+     
 
       const updated = orders.map((order) =>
         selectedOrderId.includes(order._id)

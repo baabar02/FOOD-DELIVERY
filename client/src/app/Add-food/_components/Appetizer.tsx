@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { FoodDialog } from "./FoodDialog";
+import { InsertFood } from "./insert-food";
 
 type FoodProps = {
   foodName: string;
@@ -33,6 +34,10 @@ export const Appetizer = ({ foods, }: PropsType) => {
       <div className="mb-8 w-full max-w-[1250px] px-4">
         <h2 className="text-4xl font-bold text-amber-50 mb-6">Appetizers</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <Plus/>
+         
+           <InsertFood foods={foods} />}
          {foods["Appatizer"].slice(0, 6).map((food) => {
            return (
              <div
