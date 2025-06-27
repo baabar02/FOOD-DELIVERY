@@ -5,5 +5,5 @@ import { TokenChecker } from "../src/middleware/token-checker";
 
 export const CategoryRouter = Router();
 
-CategoryRouter.get("/categories", allCategory);
-CategoryRouter.post("/category", TokenChecker, createCategory);
+CategoryRouter.get("/categories",  TokenChecker, allCategory);
+CategoryRouter.post("/categories", TokenChecker, createCategory);
