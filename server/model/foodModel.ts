@@ -2,7 +2,7 @@ import { model, ObjectId, Schema } from "mongoose";
 
 type NewType = {
   foodName: string;
-  price: Number;
+  price: number;
   image: string;
   ingredients: string;
   category: ObjectId;

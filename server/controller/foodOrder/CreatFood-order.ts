@@ -7,7 +7,7 @@ export const CreateFoodOrder = async (request: Request, response: Response) => {
   try {
     const { user, totalPrice, foodOrderItems, address } = request.body;
     const { userId } = response.locals;
-    console.log(response.locals, "userIda]");
+    // console.log(response.locals, "userIda]");
 
     if (!user || !totalPrice || !foodOrderItems || !address) {
       return response.status(400).send({ message: "Missing required fields" });
@@ -52,7 +52,7 @@ export const CreateFoodOrder = async (request: Request, response: Response) => {
       "email phoneNumber address"
     );
     // .populate("foodOrderItems.food");
-    console.log("Received foodOrderItems:", foodOrderItems);
+
     response.status(201).send({
       message: "Food order created successfully",
       data: populatedOrder,
