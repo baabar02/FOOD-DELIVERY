@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-import { redirect, useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
 import axios from "axios";
 
 type UserData = {
@@ -59,22 +59,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const pathname = usePathname();
+
   useEffect(() => {
-    if (user?.role) {
-      console.log("user is admin");
-      router.push("/admin/orders");
+    if (!user) return;
+    if (user.role) {
+      if (!pathname.startsWith("/admin")) {
+        router.push("/admin/orders");
+      }
     } else {
-      console.log("after token");
-      router.push("/");
-      console.log("after redirect");
+      if (pathname !== "/") {
+        router.push("/");
+      }
     }
-  }, [user]);
+  }, [user, pathname]);
 
   return (
     <AuthContext.Provider value={{ user, setUser, tokenChecker }}>
-   
-        {children}
-   
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -16,6 +16,7 @@ import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useFoodCart } from "@/app/_components/CardProvider";
+import { Cart } from "./Cart";
 
 type FoodOrderProps = {
   foodName: string;
@@ -50,6 +51,7 @@ export const OrderDetail = () => {
   const [addressInput, setAddressInput] = useState<string>("");
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  // const [notification, setNotification] = useState<number>(0);
   const router = useRouter();
   const { user } = useAuth();
 
@@ -230,7 +232,8 @@ export const OrderDetail = () => {
             <>
               <p className="text-amber-50 mt-4">My Cart</p>
               <div className="self-center max-w-[471px] mt-4 flex flex-col gap-4 rounded-2xl bg-white p-6">
-                {cart.length === 0 ? (
+                <Cart removeItem={removeItem} />
+                {/* {cart.length === 0 ? (
                   <p className="text-sm text-gray-500">Your cart is empty.</p>
                 ) : (
                   cart.map((item, index) => (
@@ -282,7 +285,7 @@ export const OrderDetail = () => {
                       </div>
                     </div>
                   ))
-                )}
+                )} */}
                 <div>
                   <p>Delivery location</p>
                   <Input

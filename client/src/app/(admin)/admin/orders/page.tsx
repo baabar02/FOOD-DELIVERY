@@ -25,8 +25,7 @@ const AdminOrderPage = () => {
   const [orderStatus, setOrderStatus] = useState<orderStatusType>(
     orderStatusType.PENDING
   );
-// const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
+  // const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -49,6 +48,7 @@ const AdminOrderPage = () => {
     id: order._id,
     number: index + 1,
     customer: `${order.email}`,
+    image: `${order.image}`,
     food: `${order.foodOrderItems?.length || 0} food`,
     date: format(new Date(order.createdAt), "yyyy-MM-dd"),
     total: Number(order.totalPrice),
@@ -65,51 +65,50 @@ const AdminOrderPage = () => {
       setSelectedOrderId(removed);
     }
   };
+  console.log(selectedOrderId, "hhha");
 
   const statusHandlerAction = (orderStatus: orderStatusType) => {
     setOrderStatus(orderStatus);
   };
 
-
-const saveChangeAction = async (): Promise<void> => {
-  if (selectedOrderId.length === 0) {
-    alert("Please select at least one order to update.");
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Please log in!");
+  const saveChangeAction = async (): Promise<void> => {
+    if (selectedOrderId.length === 0) {
+      alert("Please select at least one order to update.");
       return;
     }
 
-    const prepare = selectedOrderId.map((order) => ({
-      _id: order,
-      status: orderStatus,
-    }));
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in!");
+        return;
+      }
 
-    await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/admin/order/update`,
-      { orders: prepare },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      const prepare = selectedOrderId.map((order) => ({
+        _id: order,
+        status: orderStatus,
+      }));
 
-    const updated = orders.map((order) =>
-      selectedOrderId.includes(order._id)
-        ? { ...order, status: orderStatus }
-        : order
-    );
-    setOrders(updated);
-    setSelectedOrderId([]);
-  } catch (error) {
-    console.error("Failed to update orders:", error);
-    throw new Error("Failed to update orders");
-  } finally {
-   
-  }
-};
+      await axios.put(
+        "http://localhost:8000/admin/order/update",
+        { orders: prepare },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log(prepare, "ppp");
 
+      const updated = orders.map((order) =>
+        selectedOrderId.includes(order._id)
+          ? { ...order, status: orderStatus }
+          : order
+      );
+      setOrders(updated);
+      setSelectedOrderId([]);
+    } catch (error) {
+      console.error("Failed to update orders:", error);
+      throw new Error("Failed to update orders");
+    } finally {
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -117,16 +116,20 @@ const saveChangeAction = async (): Promise<void> => {
     router.push("/LogIn");
   };
 
-
-
   return (
     <div className="w-full bg-gray-50 container mx-4">
-       <Button  
-       className="flex flex-reverse"
-       onClick={handleLogout}>Logout</Button>
+      <Button className="flex flex-reverse" onClick={handleLogout}>
+        Logout
+      </Button>
       <div className="flex flex-col justify-between">
-        <div className="flex justify-between">
+        <div className="flex mx-4 justify-between">
+          <div>
             <h1 className="text-2xl font-black mb-5">Orders</h1>
+            <h2 className="mt-2 text-sm text-muted-foreground">
+              Items: {data.length}
+            </h2>
+          </div>
+
           {/* <DatePicker
               selected={selectedDate}
               onChange={(date: Date | null) => setSelectedDate(date)}
@@ -135,24 +138,18 @@ const saveChangeAction = async (): Promise<void> => {
               className="border rounded-md p-2"
               isClearable
             /> */}
-<StateChanger
-          saveChangeAction={saveChangeAction}
-          statusHandlerAction={statusHandlerAction}
-          orderStatus={orderStatus} 
-          selectedOrderIds={selectedOrderId} />
+          <StateChanger
+            saveChangeAction={saveChangeAction}
+            statusHandlerAction={statusHandlerAction}
+            orderStatus={orderStatus}
+            selectedOrderIds={selectedOrderId}
+          />
         </div>
-    
-      <DataTableDemo data={data} 
-      onCheckedChangeAction={function (_id: string, _status: boolean): void {
-    throw new Error("Function not implemented.");
-  }}
 
-        />
+        <DataTableDemo data={data} onCheckedChangeAction={selectHandler} />
       </div>
-     
     </div>
   );
 };
 
 export default AdminOrderPage;
-

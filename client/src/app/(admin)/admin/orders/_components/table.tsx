@@ -1,8 +1,6 @@
-
 "use client";
 import * as React from "react";
 import {
-
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -10,9 +8,15 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { customColums, Payment } from "./column";
-
 
 interface DataTableProps {
   data: Payment[];
@@ -30,13 +34,12 @@ export function DataTableDemo({ data, onCheckedChangeAction }: DataTableProps) {
     getSortedRowModel: getSortedRowModel(),
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize: 5,
       },
     },
   });
 
   return (
-    
     <div>
       <div className="rounded-md border">
         <Table>
@@ -47,26 +50,52 @@ export function DataTableDemo({ data, onCheckedChangeAction }: DataTableProps) {
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
+            {/* <div className="flex flex-row-reverse gap-2 mt-4">
+              <Button
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+              <Button
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+            </div> */}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
@@ -75,13 +104,18 @@ export function DataTableDemo({ data, onCheckedChangeAction }: DataTableProps) {
         </Table>
       </div>
       <div className="flex flex-row-reverse gap-2 mt-4">
-         <Button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
           Next
         </Button>
-        <Button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <Button
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
           Previous
         </Button>
-       
       </div>
     </div>
   );

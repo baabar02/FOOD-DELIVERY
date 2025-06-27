@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { orderStatusType } from "../page";
 
@@ -13,6 +13,7 @@ export type Payment = {
   food: string;
   date: string;
   total: number;
+  image: string;
   status: orderStatusType;
   address: string;
   quantity: number;
@@ -37,8 +38,13 @@ export const customColums = (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => {
-          selectHandler(row.original.id, !!value);
           row.toggleSelected(!!value);
+
+          if (value === true) {
+            selectHandler(row.original.id, true);
+          } else {
+            selectHandler(row.original.id, false);
+          }
         }}
         aria-label="Select row"
       />
@@ -72,10 +78,21 @@ export const customColums = (
     ),
     enableSorting: true,
   },
+  // {
+  //   accessorKey: "food",
+
+  //   header: "Food",
+  // },
   {
     accessorKey: "food",
     header: "Food",
+    cell: ({ row }) => {
+      const food = row.original.food;
+      <ArrowUpDown />;
+      return <span className="font-medium text-gray-800">{food}</span>;
+    },
   },
+
   {
     accessorKey: "date",
     header: ({ column }) => (
@@ -90,8 +107,6 @@ export const customColums = (
     enableSorting: true,
   },
 
- 
-
   // {
   //   accessorKey: "quantity",
   //   header: ({ column }) => (
@@ -105,7 +120,7 @@ export const customColums = (
   //   ),
   //   enableSorting: true,
   // },
-    {
+  {
     accessorKey: "total",
     header: ({ column }) => (
       <Button
@@ -119,11 +134,11 @@ export const customColums = (
     enableSorting: true,
   },
 
-    {
+  {
     accessorKey: "address",
     header: "Delivery address",
   },
-   {
+  {
     accessorKey: "status",
     header: ({ column }) => (
       <Button
