@@ -94,7 +94,9 @@ const AdminMenuPage = () => {
       <div className="flex gap-[10px]">
         {categories.map((category) => {
           return (
-            <Button variant="outline">
+            <Button 
+              key={category._id}
+              variant="outline">
               {category.categoryName}:{" "}
               {foods && foods[category.categoryName]?.length}
             </Button>
@@ -118,7 +120,7 @@ const AdminMenuPage = () => {
                 {category.categoryName}({category.categoryName.length})
               </h2>
 
-              <div className="grid grid-cols-4 gap-2">
+              <div className=" grid grid-cols-4 gap-2">
                 <div className="flex flex-col border  border-dashed border-red-400 p-2 rounded justify-center">
                   <div className="gap-2 self-center content-center">
                     <InsertFoodTab category={category} />
