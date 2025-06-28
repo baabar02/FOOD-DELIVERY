@@ -1,64 +1,47 @@
 "use client";
-import { useRouter } from "next/navigation";
+
 import { useFormik } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
-import { useAuth } from "@/app/_components/UserProvider";
 import { ChangeEvent, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
+import { DialogFooter, DialogHeader } from "@/components/ui/dialog";
 
 type FoodType = {
-  categoryName?: string;
-   foodName: string;
-  image: string;
-  ingredients: string;
-  price: number;
-};
-
-type FoodProps = {
   foodName: string;
-  image: string;
   ingredients: string;
   price: number;
-  _id: string;
- address:string;
 };
 
 type PropsType = {
-  foods: Record<string, FoodProps[]>;
- 
+  category: Record<string, string>;
 };
 
-type FoodValues = {
+type CategoryType = {
   categoryName: string;
-};
-
-type CategoryPageProps = {
-  onCreatedCategory: (categoryName: string) => void;
+  _id: string;
 };
 
 const FoodValidationSchema = Yup.object({
   foodName: Yup.string()
     .required("Food name is required")
-    .min(2, "Food name must be at least 2 characters")
     .max(50, "Food name must not exceed 50 characters"),
   ingredients: Yup.string().required("Ingredients are required"),
-  price: Yup.number().required("Price is required").min(0, "Price must be positive"),
-  categoryName: Yup.string().required("Category is required"),
+  price: Yup.number()
+    .required("Price is required")
+    .min(0, "Price must be positive"),
 });
 
-export const InsertFood = ({ foods }: PropsType) => {
-  const router = useRouter();
-
-
-  const { user } = useAuth();
- 
+export const InsertFoodTab = ({ category }: PropsType) => {
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
-  
-  const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [error, setError] = useState("");
 
   const uploadImage = async () => {
@@ -81,8 +64,8 @@ export const InsertFood = ({ foods }: PropsType) => {
       );
 
       const result = await response.json();
-      console.log("Uploaded image URL:", result.secure_url);
       alert("Image uploaded successfully!");
+
       return result.secure_url;
     } catch (error) {
       console.error("Failed to upload image:", error);
@@ -105,40 +88,35 @@ export const InsertFood = ({ foods }: PropsType) => {
 
   const formik = useFormik<FoodType>({
     initialValues: {
-      categoryName: "",
-      foodName:"",
-      image:"",
-      ingredients:"",
-      price:0,  
-
+      foodName: "",
+      ingredients: "",
+      price: 0,
     },
     validationSchema: FoodValidationSchema,
     onSubmit: async (values) => {
       try {
         const token = localStorage.getItem("token");
 
-const imageUrl = await uploadImage();
-if (!imageUrl) return;
+        const imageUrl = await uploadImage();
+        if (!imageUrl) return;
 
-const response = await axios.post(
-  "http://localhost:8000/foods",
-  {
-    foodName: values.foodName,
-    image: imageUrl,
-    ingredients: values.ingredients,
-    price: values.price,
-    category: values.categoryName,
-  },
-  {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
-);
-
+        const response = await axios.post(
+          "http://localhost:8000/foods",
+          {
+            foodName: values.foodName,
+            image: imageUrl,
+            ingredients: values.ingredients,
+            price: values.price,
+            category: category._id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         alert(response.data.message);
-      
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message || "An error occurred. Please try again.";
@@ -147,52 +125,73 @@ const response = await axios.post(
     },
   });
 
-const createCategory = async () => {
-    if (!newCategoryName.trim()) {
-      setError("Category name is required");
-      return;
-    }
+  const chooseCategory = async () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.post(
-        "http://localhost:8000/category",
-        { categoryName: newCategoryName.trim() },
+        "http://localhost:8000/categories",
+
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      setNewCategoryName("");
+      chooseCategory();
       setError("");
-      formik.setFieldValue("categoryName", data.data.categoryName); 
+
+      formik.setFieldValue("categoryName", data.data.categoryName);
     } catch (error: any) {
       setError(error.response?.data?.message || "Failed to create category");
     }
   };
 
   return (
-   <Tabs defaultValue="food" className="w-[400px]">
-      <TabsList>
-        <TabsTrigger value="food">Add Food</TabsTrigger>
-        <TabsTrigger value="category">Add Category</TabsTrigger>
-      </TabsList>
-      <TabsContent value="food">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className=" bg-red-500">
+          <Plus className="text-white" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="absolute z-50 bg-white border border-green-400 shadow-2xl rounded-2xl !h-[600px] !w-[460px]">
+        <DialogHeader>
+          <DialogTitle className="ml-6">Add new Dishes</DialogTitle>
+        </DialogHeader>
+
         <form onSubmit={formik.handleSubmit} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              name="foodName"
-              value={formik.values.foodName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Food Name"
-              className="border p-2 w-full"
-            />
-            {formik.touched.foodName && formik.errors.foodName && (
-              <p className="text-red-500 text-sm">{formik.errors.foodName}</p>
-            )}
+          <div className="flex justify-center gap-6">
+            <div className="flex flex-col">
+              <p>Food name</p>
+              <input
+                type="text"
+                name="foodName"
+                value={formik.values.foodName}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Food Name"
+                className="w-[194px] border p-2"
+              />
+              {formik.touched.foodName && formik.errors.foodName && (
+                <p className="text-red-500 text-sm">{formik.errors.foodName}</p>
+              )}
+            </div>
+            <div className="flex flex-col">
+              <p>Price</p>
+              <input
+                type="text"
+                name="price"
+                value={formik.values.price}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                placeholder="Enter price"
+                className="w-[194px] border p-2"
+              />
+              {formik.touched.price && formik.errors.price && (
+                <p className="text-red-500 text-sm">{formik.errors.price}</p>
+              )}
+            </div>
           </div>
-          <div>
+          <div className="flex flex-col">
+            <p className="ml-6">Ingredients</p>
             <input
               type="text"
               name="ingredients"
@@ -200,69 +199,70 @@ const createCategory = async () => {
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               placeholder="Ingredients"
-              className="border p-2 w-full"
+              className="border p-2 w-[412px] h-[112px] mx-auto text-wrap"
             />
             {formik.touched.ingredients && formik.errors.ingredients && (
-              <p className="text-red-500 text-sm">{formik.errors.ingredients}</p>
+              <p className="text-red-500 ml-6 text-sm">
+                {formik.errors.ingredients}
+              </p>
             )}
           </div>
-          <div>
-            <input
-              type="number"
-              name="price"
-              value={formik.values.price}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              placeholder="Price"
-              className="border p-2 w-full"
-            />
-            {formik.touched.price && formik.errors.price && (
-              <p className="text-red-500 text-sm">{formik.errors.price}</p>
-            )}
-          </div>
-          <div>
-            <select
-              name="categoryName"
-              value={formik.values.categoryName}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="border p-2 w-full"
-            >
-              <option value="">Select a category</option>
-              {categories.map((cat:) => (
-                <option key={cat.categoryName} value={cat.categoryName}>
-                  {cat.categoryName}
-                </option>
-              ))}
-            </select>
-            {formik.touched.categoryName && formik.errors.categoryName && (
-              <p className="text-red-500 text-sm">{formik.errors.categoryName}</p>
-            )}
-          </div>
-          <div>
+
+          <div className="flex mx-auto items-center content-center w-[412px] h-[112px] border border-blue-500 border-dashed">
             <input type="file" onChange={fileHandler} accept="image/*" />
             {url && <img src={url} alt="Preview" className="w-24 h-24 mt-2" />}
           </div>
-          <Button type="submit">Add Food</Button>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-        </form>
-      </TabsContent>
-      <TabsContent value="category">
-        <div className="space-y-4">
-          <input
-            type="text"
-            value={newCategoryName}
-            onChange={(e) => setNewCategoryName(e.target.value)}
-            placeholder="Enter category name (e.g., Pizza)"
-            className="border p-2 w-full"
-          />
-          <Button onClick={createCategory}>Create Category</Button>
-          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-        </div>
-      </TabsContent>
-    </Tabs>
+          <DialogFooter className="flex content-between">
+            <Button>
+              <Trash2 />
+            </Button>
 
+            <Button
+              className="mr-6"
+              type="button"
+              onClick={() => formik.handleSubmit()}
+            >
+              Add new Dishes
+            </Button>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+          </DialogFooter>
+
+          {/* <div className="space-y-4">
+              <input
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Enter category name (e.g., Pizza)"
+                className="border p-2 w-full"
+              />
+              <Button onClick={createCategory}>Create Category</Button>
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            </div> */}
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
+// const createCategory = async () => {
+//   if (!newCategoryName.trim()) {
+//     setError("Category name is required");
+//     return;
+//   }
+//   try {
+//     const token = localStorage.getItem("token");
+//     const { data } = await axios.post(
+//       "http://localhost:8000/categories",
+//       // { categoryName: newCategoryName.trim() },
+//       {
+//         headers: { Authorization: `Bearer ${token}` },
+//       }
+//     );
 
+//     setNewCategoryName("");
+//     setError("");
+//     formik.setFieldValue("categoryName", data.data.categoryName);
+//   } catch (error: any) {
+//     setError(error.response?.data?.message || "Failed to create category");
+//   }
+// };

@@ -8,7 +8,7 @@ type FoodProps = {
   ingredients: string;
   price: number;
   _id: string;
-  address:string;
+  address: string;
 };
 
 type PropsType = {

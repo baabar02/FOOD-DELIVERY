@@ -94,7 +94,6 @@ const AdminOrderPage = () => {
         { orders: prepare },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-     
 
       const updated = orders.map((order) =>
         selectedOrderId.includes(order._id)
@@ -117,8 +116,8 @@ const AdminOrderPage = () => {
   };
 
   return (
-    <div className="w-full bg-gray-50 container mx-4">
-      <Button className="flex flex-reverse" onClick={handleLogout}>
+    <div className="flex flex-col w-full bg-gray-50 container mx-4">
+      <Button className="flex w-[50px] flex-reverse" onClick={handleLogout}>
         Logout
       </Button>
       <div className="flex flex-col justify-between">
