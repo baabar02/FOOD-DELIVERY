@@ -7,6 +7,7 @@ import axios from "axios";
 import CategoryPage from "../Add-category/page";
 import { Plus } from "lucide-react";
 import { InsertFoodTab } from "@/app/Add-food/_components/insert-food";
+import { UpdateFoodTab } from "@/app/Add-food/_components/Update-food-tab";
 
 type UserType = {
   _id: string;
@@ -14,6 +15,7 @@ type UserType = {
 };
 
 type FoodNewType = {
+  _id:string;
   foodName: string;
   price: number;
   image: string;
@@ -88,8 +90,28 @@ const AdminMenuPage = () => {
     }
   };
 
+const refreshFoods = async () =>{
+  try{
+const token = localStorage.getItem("token");
+const {data} = await axios.get("http://localhost:8000/foods",{
+  headers:{ Authorization: `Bearer ${token}` },
+}
+ 
+  
+);
+ setFoods(data?.foods)
+  } catch (error){
+console.error("Error refreshing foods:", error);
+  }
+}
+
   return (
     <div className="flex w-full flex-col">
+      <div className="flex flex-row-reverse w-20">
+<Button onClick={handleLogout} className="mt-6">
+        Logout
+      </Button>
+</div>
       <h1 className="text-xl font-bold mb-4">Dishes Category</h1>
       <div className="flex gap-[10px]">
         {categories.map((category) => {
@@ -130,7 +152,7 @@ const AdminMenuPage = () => {
                 {foods?.[category.categoryName as keyof typeof foods]?.map(
                   (food) => (
                     <div
-                      key={food.foodName}
+                      key={food._id}
                       className="flex flex-col  border p-2 rounded"
                     >
                       <div>
@@ -139,7 +161,12 @@ const AdminMenuPage = () => {
                           alt={food.foodName}
                           className="w-[260px] h-[130px] object-cover"
                         />
-                        <Plus className="absolute mr-5" />
+                        <div className="absolute mt-[-50px] ml-[220px]">
+                           <UpdateFoodTab food={food} categories={categories} onFoodUpdated={refreshFoods}/>
+                   
+
+                        </div>
+                       
                       </div>
                       <div className="flex">
                         <div>{food.foodName}</div>
@@ -158,10 +185,7 @@ const AdminMenuPage = () => {
         })}
       </div>
 
-      <div></div>
-      <Button onClick={handleLogout} className="mt-6">
-        Logout
-      </Button>
+      
     </div>
   );
 };
