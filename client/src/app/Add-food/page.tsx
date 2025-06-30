@@ -18,7 +18,9 @@ const Food = () => {
 
   const getFoods = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/foods");
+      const res = await axios.get(
+        "https://food-delivery-p342.onrender.com/foods"
+      );
       setFoods(res.data);
     } catch (error) {
       console.log(error);

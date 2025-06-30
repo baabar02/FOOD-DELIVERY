@@ -41,14 +41,19 @@ export const NewPassword = ({ email, prevStep }: NewPasswordProps) => {
         return;
       }
       try {
-        await axios.post("http://localhost:8000/reset-password", {
-          email,
-          newPassword: values.password,
-        });
+        await axios.post(
+          "https://food-delivery-p342.onrender.com/reset-password",
+          {
+            email,
+            newPassword: values.password,
+          }
+        );
         setSuccess("Password reset successfully! Redirecting to login...");
         setTimeout(() => router.push("/LogIn"), 2000);
       } catch (err: any) {
-        setError(err.response?.data?.message || "An error occurred. Please try again.");
+        setError(
+          err.response?.data?.message || "An error occurred. Please try again."
+        );
       }
     },
   });
@@ -108,7 +113,9 @@ export const NewPassword = ({ email, prevStep }: NewPasswordProps) => {
             className="w-full rounded-md"
           />
           {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-            <div className="text-red-500 text-sm">{formik.errors.confirmPassword}</div>
+            <div className="text-red-500 text-sm">
+              {formik.errors.confirmPassword}
+            </div>
           )}
           <div className="flex items-center gap-2">
             <Checkbox

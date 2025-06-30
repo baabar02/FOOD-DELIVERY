@@ -32,9 +32,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const tokenChecker = async (token: string) => {
     try {
-      const response = await axios.post("http://localhost:8000/verify", {
-        token: token,
-      });
+      const response = await axios.post(
+        "https://food-delivery-p342.onrender.com/verify",
+        {
+          token: token,
+        }
+      );
 
       //         if (response.data?.userId) {
       //   setUser({ userId: response.data.userId });

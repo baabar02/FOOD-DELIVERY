@@ -106,7 +106,7 @@ export const UpdateFoodTab = ({
         if (!imageUrl) return;
 
         const response = await axios.put(
-          `http://localhost:8000/admin/food-update/`,
+          `https://food-delivery-p342.onrender.com/admin/food-update/`,
           {
             food: {
               _id: values._id,
@@ -137,9 +137,12 @@ export const UpdateFoodTab = ({
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8000/foods/${food._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://food-delivery-p342.onrender.com/foods/${food._id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       alert("Food deleted successfully!");
       onFoodUpdated();
     } catch (err: any) {

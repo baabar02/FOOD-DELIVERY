@@ -36,14 +36,16 @@ export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
         return;
       }
       try {
-        await axios.post("http://localhost:8000/checkOtp", {
+        await axios.post("https://food-delivery-p342.onrender.com/checkOtp", {
           email,
           otp: values.otp,
         });
         setSuccess("OTP verified! Redirecting...");
-        setTimeout(() => nextStep(), 2000); 
+        setTimeout(() => nextStep(), 2000);
       } catch (err: any) {
-        setError(err.response?.data?.message || "An error occurred. Please try again.");
+        setError(
+          err.response?.data?.message || "An error occurred. Please try again."
+        );
       }
     },
   });
@@ -54,7 +56,9 @@ export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
       return;
     }
     try {
-      await axios.post("http://localhost:8000/sendOtp", { email });
+      await axios.post("https://food-delivery-p342.onrender.com/sendOtp", {
+        email,
+      });
       setSuccess("OTP resent to your email.");
     } catch (err: any) {
       setError(err.response?.data?.message || "An error occurred.");
@@ -74,7 +78,7 @@ export const VerifyPage = ({ email, nextStep, prevStep }: VerifyPageProps) => {
             variant="outline"
             className="bg-transparent"
             type="button"
-            onClick={prevStep} 
+            onClick={prevStep}
           >
             <ChevronLeft size={16} />
           </Button>

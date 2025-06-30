@@ -70,11 +70,14 @@ export const OrderDetail = () => {
           if (!token) {
             alert("You must logged in");
           }
-          const response = await axios.get("http://localhost:8000/food-order", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+          const response = await axios.get(
+            "https://food-delivery-p342.onrender.com/food-order",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
           console.log("Fetched orders:", response.data);
 
           setOrders(response.data.data);
@@ -131,7 +134,7 @@ export const OrderDetail = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/create-order",
+        "https://food-delivery-p342.onrender.com/create-order",
 
         {
           user: user.userId,
@@ -172,11 +175,14 @@ export const OrderDetail = () => {
   const clearOrderHistory = async (id: string) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:8000/clear-order/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(
+        `https://food-delivery-p342.onrender.com/clear-order/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const remaining = orders.filter((item) => item._id != id);
       setOrders(remaining);
     } catch (error: any) {

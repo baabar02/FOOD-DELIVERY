@@ -31,13 +31,16 @@ export const ResetPage = ({ nextStep, setEmail }: ResetPageProps) => {
     validationSchema,
     onSubmit: async (values) => {
       try {
-        await axios.post("http://localhost:8000/sendOtp", { email: values.email });
+        await axios.post("https://food-delivery-p342.onrender.com/sendOtp", {
+          email: values.email,
+        });
         setSuccess("OTP sent to your email.");
-        setEmail(values.email); 
-        setTimeout(() => nextStep(), 2000); 
-        
+        setEmail(values.email);
+        setTimeout(() => nextStep(), 2000);
       } catch (err: any) {
-        setError(err.response?.data?.message || "An error occurred. Please try again.");
+        setError(
+          err.response?.data?.message || "An error occurred. Please try again."
+        );
       }
     },
   });

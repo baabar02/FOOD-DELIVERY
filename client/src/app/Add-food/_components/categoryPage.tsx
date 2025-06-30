@@ -33,7 +33,7 @@ export const CategoryPage = ({ onCreatedCategory }: Props) => {
         const token = localStorage.getItem("token");
 
         const response = await axios.post(
-          "http://localhost:8000/categories",
+          "https://food-delivery-p342.onrender.com/categories",
           { categoryName: values.categoryName },
           {
             headers: {

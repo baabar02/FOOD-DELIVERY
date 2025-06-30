@@ -3,7 +3,6 @@ import { Appetizer } from "./Add-food/_components/Appetizer";
 import { Pizza } from "./Add-food/_components/Pizza";
 import { Salad } from "./Add-food/_components/Salad";
 
-
 type FoodProps = {
   foodName: string;
   image: string;
@@ -17,24 +16,20 @@ type PropsType = {
 };
 
 const Home = async () => {
-  const { data } = await axios.get("http://localhost:8000/foods");
-
+  const { data } = await axios.get(
+    "https://food-delivery-p342.onrender.com/foods"
+  );
 
   return (
     <div className="text-2xl">
       <Appetizer foods={data.foods} />
       <Salad foods={data.foods} />
       <Pizza foods={data.foods} />
-
     </div>
   );
 };
 
 export default Home;
-
-
-
-
 
 // const handleLogout = () => {
 //   localStorage.removeItem("token");

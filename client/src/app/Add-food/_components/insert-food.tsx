@@ -101,7 +101,7 @@ export const InsertFoodTab = ({ category }: PropsType) => {
         if (!imageUrl) return;
 
         const response = await axios.post(
-          "http://localhost:8000/foods",
+          "https://food-delivery-p342.onrender.com/foods",
           {
             foodName: values.foodName,
             image: imageUrl,
@@ -129,7 +129,7 @@ export const InsertFoodTab = ({ category }: PropsType) => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.post(
-        "http://localhost:8000/categories",
+        "https://food-delivery-p342.onrender.com/categories",
 
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -254,7 +254,7 @@ export const InsertFoodTab = ({ category }: PropsType) => {
 //   try {
 //     const token = localStorage.getItem("token");
 //     const { data } = await axios.post(
-//       "http://localhost:8000/categories",
+//       "https://food-delivery-p342.onrender.com/categories",
 //       // { categoryName: newCategoryName.trim() },
 //       {
 //         headers: { Authorization: `Bearer ${token}` },

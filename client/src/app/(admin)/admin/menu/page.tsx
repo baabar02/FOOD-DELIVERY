@@ -47,9 +47,12 @@ const AdminMenuPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const getFoodsGroupedByCategory = async () => {
-      const { data } = await axios.get("http://localhost:8000/foods", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.get(
+        "https://food-delivery-p342.onrender.com/foods",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setFoods(data?.foods);
     };
     getFoodsGroupedByCategory();
@@ -62,9 +65,12 @@ const AdminMenuPage = () => {
     const token = localStorage.getItem("token");
     const getCategories = async () => {
       try {
-        const { data } = await axios.get("http://localhost:8000/categories", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await axios.get(
+          "https://food-delivery-p342.onrender.com/categories",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setCategories(data?.data || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -77,7 +83,7 @@ const AdminMenuPage = () => {
     try {
       const token = localStorage.getItem("token");
       const { data } = await axios.post(
-        "http://localhost:8000/categories",
+        "https://food-delivery-p342.onrender.com/categories",
         { categoryName },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -94,9 +100,12 @@ const AdminMenuPage = () => {
   const refreshFoods = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:8000/foods", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await axios.get(
+        "https://food-delivery-p342.onrender.com/foods",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setFoods(data?.foods);
     } catch (error) {
       console.error("Error refreshing foods:", error);

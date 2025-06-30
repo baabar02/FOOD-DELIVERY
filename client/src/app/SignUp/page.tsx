@@ -100,10 +100,13 @@ const SignUpPage = () => {
     onSubmit: async (values) => {
       console.log("asdfghjkl");
 
-      const response = await axios.post("http://localhost:8000/signup", {
-        email: values.email,
-        password: values.password,
-      });
+      const response = await axios.post(
+        "https://food-delivery-p342.onrender.com/signup",
+        {
+          email: values.email,
+          password: values.password,
+        }
+      );
 
       if (response.data.message === "User already existed") {
         alert("User already existed");

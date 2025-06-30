@@ -50,10 +50,13 @@ const LogInPage = () => {
 
     onSubmit: async (values) => {
       try {
-        const response = await axios.post("http://localhost:8000/login", {
-          email: values.email,
-          password: values.password,
-        });
+        const response = await axios.post(
+          "https://food-delivery-p342.onrender.com/login",
+          {
+            email: values.email,
+            password: values.password,
+          }
+        );
 
         console.log("after response");
 
