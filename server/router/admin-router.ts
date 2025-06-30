@@ -10,5 +10,9 @@ import { updateFoods } from "../controller/admin/update-foods";
 export const AdminRouter = Router();
 
 AdminRouter.get("/admin/all-orders", [TokenChecker, isAdmin], getAllOrders);
-AdminRouter.put("/admin/order/update", [TokenChecker, isAdmin], updateOrderStatus);
-AdminRouter.put("/admin/food-update", [TokenChecker,isAdmin], updateFoods);
+AdminRouter.put(
+  "/admin/order/update",
+  [TokenChecker, isAdmin],
+  updateOrderStatus
+);
+AdminRouter.put("/admin/food-update/", [TokenChecker, isAdmin], updateFoods);
