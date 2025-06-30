@@ -1,11 +1,9 @@
 {
   "name": "food-delivery-backend",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "build": "tsc",
-    "start": "node index.js"
+    "start": "nodemon"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
