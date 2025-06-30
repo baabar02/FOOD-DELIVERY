@@ -20,9 +20,9 @@ const FoodValidationSchema = Yup.object({
     .max(50, "Category name must not exceed 50 characters"),
 });
 
-const CategoryPage = ({ onCreatedCategory }: CategoryPageProps) => {
+export const CategoryPage = ({ onCreatedCategory }: CategoryPageProps) => {
   const router = useRouter();
-const [categoryName, setCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
 
   const formik = useFormik<FoodValues>({
     initialValues: {
@@ -86,5 +86,3 @@ const [categoryName, setCategoryName] = useState("");
     </div>
   );
 };
-
-export default CategoryPage;

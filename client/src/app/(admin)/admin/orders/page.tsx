@@ -2,20 +2,14 @@
 import { Button } from "@/components/ui/button";
 
 import axios from "axios";
-import { Calendar, Table } from "lucide-react";
+
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DataTableDemo } from "./_components/table";
 import { format } from "date-fns";
 import { StateChanger } from "./_components/statechanger";
 import { Payment } from "./_components/column";
-// import DatePicker from "react-datepicker";
-
-export enum orderStatusType {
-  PENDING = "PENDING",
-  CANCELLED = "CANCELLED",
-  DELIVERED = "DELIVERED",
-}
+import { orderStatusType } from "./enum";
 
 const AdminOrderPage = () => {
   const router = useRouter();
@@ -124,9 +118,11 @@ const AdminOrderPage = () => {
         <div className="flex mx-4 justify-between">
           <div>
             <h1 className="text-2xl font-black mb-5">Orders</h1>
-            <h2 className="mt-2 text-sm text-muted-foreground">
-              Items: {data.length}
-            </h2>
+            <div>
+              <h2 className="mt-2 text-sm text-muted-foreground">
+                Items: {data.length}
+              </h2>
+            </div>
           </div>
 
           {/* <DatePicker

@@ -154,7 +154,9 @@ export const InsertFoodTab = ({ category }: PropsType) => {
       </DialogTrigger>
       <DialogContent className="absolute z-50 bg-white border border-green-400 shadow-2xl rounded-2xl !h-[600px] !w-[460px]">
         <DialogHeader>
-          <DialogTitle className="ml-6">Add new Dishes</DialogTitle>
+          <DialogTitle className="flex text-bold ml-6">
+            Add new Dishes
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">

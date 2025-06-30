@@ -9,8 +9,8 @@ type FoodValues = {
 };
 
 type Props = {
-  onCreatedCategory:(categoryName:string) => void;
-}
+  onCreatedCategory: (categoryName: string) => void;
+};
 
 const FoodValidationSchema = Yup.object({
   categoryName: Yup.string()
@@ -19,7 +19,7 @@ const FoodValidationSchema = Yup.object({
     .max(50, "Category name must not exceed 50 characters"),
 });
 
-const CategoryPage = ({onCreatedCategory}:Props) => {
+export const CategoryPage = ({ onCreatedCategory }: Props) => {
   const router = useRouter();
 
   const formik = useFormik<FoodValues>({
@@ -43,7 +43,6 @@ const CategoryPage = ({onCreatedCategory}:Props) => {
         );
 
         alert(response.data.message);
-       
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message || "An error occurred. Please try again.";
@@ -85,5 +84,3 @@ const CategoryPage = ({onCreatedCategory}:Props) => {
     </div>
   );
 };
-
-export default CategoryPage;

@@ -1,6 +1,8 @@
-import { Appetizer } from "./_components/Appetizer";
-import { Salad } from "./_components/Salad";
-import { Pizza } from "./_components/Pizza";
+"use client";
+
+import axios from "axios";
+import FoodPage from "./FoodPage";
+import { useEffect, useState } from "react";
 
 type FoodProps = {
   foodName: string;
@@ -11,18 +13,26 @@ type FoodProps = {
   address: string;
 };
 
-type PropsType = {
-  foods: Record<string, FoodProps[]>;
-};
+const Food = () => {
+  const [foods, setFoods] = useState<FoodProps[]>([]);
 
-const FoodPage = ({ foods }: PropsType) => {
+  const getFoods = async () => {
+    try {
+      const res = await axios.get("http://localhost:8000/foods");
+      setFoods(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getFoods();
+  }, []);
+
   return (
     <div className="flex flex-col">
-      <Appetizer foods={foods} />
-      <Salad foods={foods} />
-      <Pizza foods={foods} />
+      <FoodPage foods={foods} />
     </div>
   );
 };
 
-export default FoodPage;
+export default Food;

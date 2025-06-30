@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,8 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { orderStatusType } from "../page";
-
+import { orderStatusType } from "../enum";
 
 type NewType = orderStatusType;
 
@@ -27,7 +26,6 @@ export function StateChanger({
   orderStatus,
   selectedOrderIds,
 }: PropsType) {
-
   const handleSave = async () => {
     try {
       await saveChangeAction();
@@ -48,21 +46,27 @@ export function StateChanger({
         </DialogHeader>
         <div className="flex my-6 justify-evenly">
           <Button
-            variant={orderStatus === orderStatusType.PENDING ? "default" : "outline"}
+            variant={
+              orderStatus === orderStatusType.PENDING ? "default" : "outline"
+            }
             onClick={() => statusHandlerAction(orderStatusType.PENDING)}
             aria-selected={orderStatus === orderStatusType.PENDING}
           >
             {orderStatusType.PENDING}
           </Button>
           <Button
-            variant={orderStatus === orderStatusType.DELIVERED ? "default" : "outline"}
+            variant={
+              orderStatus === orderStatusType.DELIVERED ? "default" : "outline"
+            }
             onClick={() => statusHandlerAction(orderStatusType.DELIVERED)}
             aria-selected={orderStatus === orderStatusType.DELIVERED}
           >
             {orderStatusType.DELIVERED}
           </Button>
           <Button
-            variant={orderStatus === orderStatusType.CANCELLED ? "default" : "outline"}
+            variant={
+              orderStatus === orderStatusType.CANCELLED ? "default" : "outline"
+            }
             onClick={() => statusHandlerAction(orderStatusType.CANCELLED)}
             aria-selected={orderStatus === orderStatusType.CANCELLED}
           >

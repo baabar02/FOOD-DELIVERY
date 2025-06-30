@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowUpDown, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { orderStatusType } from "../page";
+import { orderStatusType } from "../enum";
 
 export type Payment = {
   id: string;

@@ -29,9 +29,9 @@ type CategoryType = {
 };
 
 type PropsType = {
-  food: FoodType; 
-  categories: CategoryType[]; 
-  onFoodUpdated: () => void; 
+  food: FoodType;
+  categories: CategoryType[];
+  onFoodUpdated: () => void;
 };
 
 const FoodValidationSchema = Yup.object({
@@ -42,16 +42,20 @@ const FoodValidationSchema = Yup.object({
   price: Yup.number()
     .required("Price is required")
     .min(0, "Price must be positive"),
-  category: Yup.string().required("Category is required"),
+  // category: Yup.string().required("Category is required"),
 });
 
-export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType) => {
+export const UpdateFoodTab = ({
+  food,
+  categories = [],
+  onFoodUpdated,
+}: PropsType) => {
   const [file, setFile] = useState<File | null>(null);
-  const [url, setUrl] = useState(food.image); 
+  const [url, setUrl] = useState(food.image);
   const [error, setError] = useState("");
 
   const uploadImage = async () => {
-    if (!file) return url; 
+    if (!file) return url;
 
     const formData = new FormData();
     formData.append("file", file);
@@ -87,6 +91,7 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
 
   const formik = useFormik({
     initialValues: {
+      _id: food._id,
       foodName: food.foodName,
       ingredients: food.ingredients,
       price: food.price,
@@ -101,13 +106,16 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
         if (!imageUrl) return;
 
         const response = await axios.put(
-          `http://localhost:8000/foods/${food._id}`, 
+          `http://localhost:8000/admin/food-update/`,
           {
-            foodName: values.foodName,
-            image: imageUrl,
-            ingredients: values.ingredients,
-            price: values.price,
-            category: values.category,
+            food: {
+              _id: values._id,
+              foodName: values.foodName,
+              image: imageUrl,
+              ingredients: values.ingredients,
+              price: values.price,
+              category: values.category,
+            },
           },
           {
             headers: {
@@ -117,7 +125,7 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
         );
 
         alert(response.data.message);
-        onFoodUpdated(); 
+        onFoodUpdated();
       } catch (err: any) {
         const errorMessage =
           err.response?.data?.message || "An error occurred. Please try again.";
@@ -148,9 +156,9 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
           <Pencil className="absolute text-white" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="absolute z-50 bg-white border border-green-400 shadow-2xl rounded-2xl !h-[600px] !w-[460px]">
+      <DialogContent className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white border border-green-400 shadow-2xl rounded-2xl !h-[600px] !w-[460px]">
         <DialogHeader>
-          <DialogTitle className="ml-6">Update Dish</DialogTitle>
+          <DialogTitle className="text-bold  ml-6">Update Dish</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={formik.handleSubmit} className="space-y-4">
@@ -205,7 +213,9 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
               ))}
             </select>
             {formik.touched.category && formik.errors.category && (
-              <p className="text-red-500 text-sm ml-6">{formik.errors.category}</p>
+              <p className="text-red-500 text-sm ml-6">
+                {formik.errors.category}
+              </p>
             )}
           </div>
           <div className="flex flex-col">
@@ -219,7 +229,9 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
               className="border p-2 w-[412px] h-[112px] mx-auto"
             />
             {formik.touched.ingredients && formik.errors.ingredients && (
-              <p className="text-red-500 text-sm ml-6">{formik.errors.ingredients}</p>
+              <p className="text-red-500 text-sm ml-6">
+                {formik.errors.ingredients}
+              </p>
             )}
           </div>
           <div className="flex mx-auto items-center content-center w-[412px] h-[112px] border border-blue-500 border-dashed">
@@ -241,15 +253,14 @@ export const UpdateFoodTab = ({ food, categories=[], onFoodUpdated }: PropsType)
   );
 };
 
-
-          // <div className="space-y-4">
-          //     <input
-          //       type="text"
-          //       value={newCategoryName}
-          //       onChange={(e) => setNewCategoryName(e.target.value)}
-          //       placeholder="Enter category name (e.g., Pizza)"
-          //       className="border p-2 w-full"
-          //     />
-          //     <Button onClick={createCategory}>Create Category</Button>
-          //     {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
-          //   </div>
+// <div className="space-y-4">
+//     <input
+//       type="text"
+//       value={newCategoryName}
+//       onChange={(e) => setNewCategoryName(e.target.value)}
+//       placeholder="Enter category name (e.g., Pizza)"
+//       className="border p-2 w-full"
+//     />
+//     <Button onClick={createCategory}>Create Category</Button>
+//     {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+//   </div>
